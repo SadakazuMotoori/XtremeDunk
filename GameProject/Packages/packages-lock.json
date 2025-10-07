@@ -15,7 +15,7 @@
       "hash": "0034a5d4ab27fac4ae8eea52b7c57a8d47c8a585"
     },
     "com.unity.addressables": {
-      "version": "2.7.3",
+      "version": "2.7.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -25,7 +25,7 @@
         "com.unity.modules.jsonserialize": "1.0.0",
         "com.unity.modules.imageconversion": "1.0.0",
         "com.unity.modules.unitywebrequest": "1.0.0",
-        "com.unity.scriptablebuildpipeline": "2.4.2",
+        "com.unity.scriptablebuildpipeline": "2.4.3",
         "com.unity.modules.unitywebrequestassetbundle": "1.0.0"
       },
       "url": "https://packages.unity.com"
@@ -175,7 +175,7 @@
       }
     },
     "com.unity.scriptablebuildpipeline": {
-      "version": "2.4.2",
+      "version": "2.4.3",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -250,6 +250,13 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
+    },
+    "jp.hadashikick.vcontainer": {
+      "version": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.17.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "177dbda557fd652ce7f5d1647a3621653e094373"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
