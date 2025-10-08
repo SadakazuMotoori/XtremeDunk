@@ -5,7 +5,6 @@
 /// </summary>
 //==================================================================
 using UnityEngine.SceneManagement;
-
 using Cysharp.Threading.Tasks;
 using MackySoft.Navigathena;
 using MackySoft.Navigathena.SceneManagement;
@@ -41,7 +40,6 @@ public sealed class RootSceneLifecycle : SceneLifecycleBase
 
 public sealed class RootSceneLifetimeScope : LifetimeScope
 {
-
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterSceneLifecycle<RootSceneLifecycle>();
@@ -49,7 +47,19 @@ public sealed class RootSceneLifetimeScope : LifetimeScope
   
     private void Start()
     {
-        // 起動時動作シーンを破棄する
-        SceneManager.UnloadSceneAsync("BootScene");
+        // 製品版ならタイトルシーンへ
+        ISceneIdentifier    _newScene       = null;
+        string              _nextSceneName  = "";
+#if true
+        _nextSceneName = "DebugScene";
+#else
+        _nextSceneName = "TitleScene";
+#endif
+        if (!SceneManager.GetSceneByName(_nextSceneName).isLoaded)
+        {
+            _newScene = new BuiltInSceneIdentifier(_nextSceneName);
+            GlobalSceneNavigator.Instance.Replace(_newScene);
+        }
     }
 }
+
