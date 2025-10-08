@@ -127,13 +127,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2841616421769271696, guid: 8bd1026f90b68fe4083ae944986dc5b7, type: 3}
+      propertyPath: parentReference.TypeName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472225278797691033, guid: 8bd1026f90b68fe4083ae944986dc5b7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6569641115143969467, guid: 8bd1026f90b68fe4083ae944986dc5b7, type: 3}
       propertyPath: m_Name
       value: BootSceneEntryPoint
-      objectReference: {fileID: 0}
-    - target: {fileID: 6569641115143969467, guid: 8bd1026f90b68fe4083ae944986dc5b7, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7530426139320267067, guid: 8bd1026f90b68fe4083ae944986dc5b7, type: 3}
       propertyPath: m_LocalPosition.x

@@ -1,3 +1,9 @@
+//==================================================================
+/// <summary>
+/// 初回起動時のみ実行されるシーンクラス
+/// 常駐するRootSceneを読込み、以降は自動的に破棄される
+/// </summary>
+//==================================================================
 using Cysharp.Threading.Tasks;
 using MackySoft.Navigathena.SceneManagement.Utilities;
 using MackySoft.Navigathena.SceneManagement.VContainer;
