@@ -50,7 +50,7 @@ public sealed class RootSceneLifetimeScope : LifetimeScope
         // 製品版ならタイトルシーンへ
         ISceneIdentifier    _newScene       = null;
         string              _nextSceneName  = "";
-#if true
+#if GAME_DEBUG
         _nextSceneName = "DebugScene";
 #else
         _nextSceneName = "TitleScene";

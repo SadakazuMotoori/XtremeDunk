@@ -822,7 +822,10 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Android: GAME_DEBUG
+    Standalone: GAME_DEBUG
+    iPhone: GAME_DEBUG
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
