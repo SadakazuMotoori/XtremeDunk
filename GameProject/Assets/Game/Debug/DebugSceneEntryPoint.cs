@@ -1,6 +1,6 @@
 //==================================================================
 /// <summary>
-/// 開発版のみRootシーンから呼び出されるデバッグ用のシーン
+/// 開発版xのみRootシーンから呼び出されるデバッグ用のシーン
 /// </summary>
 //==================================================================
 using System.Threading;
@@ -13,5 +13,13 @@ public sealed class DebugSceneEntoryPoint : SceneEntryPointBase
     protected override async UniTask OnEnter(ISceneDataReader reader, CancellationToken cancellationToken)
     {
         await UniTask.DelayFrame(1);
+    }
+
+    public void OnButton01(string aa)
+    {
+        if(UnityEngine.InputSystem.Keyboard.current.aKey.wasPressedThisFrame)
+        {
+
+        }
     }
 }
