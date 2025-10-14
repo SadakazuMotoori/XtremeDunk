@@ -13,6 +13,10 @@ MonoBehaviour:
   m_Name: ProjectDefineSettings
   m_EditorClassIdentifier: 
   items:
+  - isValid: 0
+    define: IS_PRODUCT
+    comment: "\u88FD\u54C1\u7248\u304B\u3069\u3046\u304B"
+    initialValid: 0
   - isValid: 1
     define: GAME_DEBUG
     comment: "\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u7528\u30C7\u30D0\u30C3\u30B0\u6A5F\u80FD\u6709\u52B9"
