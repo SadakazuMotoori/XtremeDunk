@@ -1,14 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 
-public class ProjectDefine_TreeView : TreeView {
+public class ProjectDefine_TreeView : TreeView
+{
     readonly List<ProjectDefine_TreeViewItem> mList;
 
     TreeViewState   mTreeViewState;
-
 
     public ProjectDefine_TreeView( List<ProjectDefine_TreeViewItem> list, TreeViewState state, MultiColumnHeader header ) : base( state, header ) {
         mList = list;
@@ -107,7 +106,7 @@ public class ProjectDefine_TreeView : TreeView {
                 columnNonTitle, //ProjectDefine_TreeViewItem.isValid
                 columnTitle,    //ProjectDefine_TreeViewItem.title
                 columnComment,  //ProjectDefine_TreeViewItem.comment
-//                columnInitial,  //ProjectDefine_TreeViewItem.initialValid
+//              columnInitial,  //ProjectDefine_TreeViewItem.initialValid
             }
         );
         var header = new MultiColumnHeader(state) {

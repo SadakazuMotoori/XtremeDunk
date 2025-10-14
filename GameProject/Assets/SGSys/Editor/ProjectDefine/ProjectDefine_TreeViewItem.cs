@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using UnityEditor.IMGUI.Controls;
 
 [System.Serializable]
-public class ProjectDefine_TreeViewItem : TreeViewItem {
+public class ProjectDefine_TreeViewItem : TreeViewItem
+{
     /// <summary>
     /// 現在の定義有効状態
     /// </summary>
