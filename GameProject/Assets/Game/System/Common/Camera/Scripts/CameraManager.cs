@@ -1,40 +1,30 @@
-using System.Collections;
+//==================================================================
+/// <summary>
+/// カメラ管理クラス
+/// </summary>
+//==================================================================
+using SGGames.Game.Sys;
+
 using System.Collections.Generic;
-using UnityEngine;
-
 using UniRx;
-using UniRx.Triggers;
-
-using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Triggers;
-
+using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-
-public interface ICameraManager// : IService<ICameraManager>
+public interface ICameraManager : IService<ICameraManager>
 {
-/*
     //======================================
     // プレイヤーカメラ関係
     //======================================
-    Transform CurrentBattleCameraTarget { get; }
-    void SetBattleCameraTarget(Transform target);
-
-    BattleCameraController BattleCamCtrl { get; }
-    void SetBattleCamera(BattleCameraController battleCamCtrl);
-    void ResetBattleCamRotateAxisToForward(float duration);
+    Transform CurrentCameraTarget { get; }
+    void SetCameraTarget(Transform target);
+    
+    CameraController CamCtrl { get; }
+    void SetCamera(CameraController CamCtrl);
 
     float SetCinemachineBrainDefaultBlendTime(float duration);
 
-    // 視点モードの変更通知
-    //    System.IObservable<ICameraManager.CameraTypes> OnBattleCameraTypeChanged { get; }
-    //    System.IDisposable SubscribeOnBattleCameraTypeChanged(System.Action<ICameraManager.CameraTypes> onNext);
-    System.IObservable<BattleCameraController.CameraData> NowBattleCamTypeRP { get; }
-    //    ICameraManager.CameraTypes NowBattleCamType { get; }
-
-    Camera UICamera { get; }
-
-    Camera CurrentMainCamera { get; }
+    Camera UICamera             { get; }
+    Camera CurrentMainCamera    { get; }
 
     // ワールド座標からUI座標へ変換
     Vector2? ConvertWorldToUIPos(Vector3 worldPos) { return Vector2.zero; }
@@ -43,58 +33,44 @@ public interface ICameraManager// : IService<ICameraManager>
     void UnmanageMainCamera(ManagedMainCamera camera);
 
     void UpdateManagedMainCameraList();
-*/
 }
 
-//==================================================================
-/// <summary>
-/// カメラ管理クラス
-/// </summary>
-//==================================================================
-public class CameraManager// : GameMonoBehaviour, ICameraManager//, Cinemachine.AxisState.IInputAxisProvider
+public class CameraManager : MonoBehaviour, ICameraManager
 {
-/*
     //======================================
     // プレイヤーカメラ関係
     //======================================
-    Transform _currentBattleCameraTarget;
-    public Transform CurrentBattleCameraTarget => _currentBattleCameraTarget;
-    public void SetBattleCameraTarget(Transform target)
+    Transform _currentCameraTarget;
+    public Transform CurrentCameraTarget => _currentCameraTarget;
+    public void SetCameraTarget(Transform target)
     {
         float old = SetCinemachineBrainDefaultBlendTime(0);
-        _currentBattleCameraTarget = target;
-        if (_battleCameraCtrl != null)
+        _currentCameraTarget = target;
+        if (_CameraCtrl != null)
         {
-            _battleCameraCtrl.SetCameraTarget(_currentBattleCameraTarget);
+            _CameraCtrl.SetCameraTarget(_currentCameraTarget);
         }
 
         SetCinemachineBrainDefaultBlendTime(old);
     }
 
-    BattleCameraController _battleCameraCtrl;
-    public BattleCameraController BattleCamCtrl => _battleCameraCtrl;
+    CameraController _CameraCtrl;
+    public CameraController CamCtrl => _CameraCtrl;
 
-    public void SetBattleCamera(BattleCameraController battleCamCtrl)
+    public void SetCamera(CameraController CamCtrl)
     {
-        _battleCameraCtrl = battleCamCtrl;
+        _CameraCtrl = CamCtrl;
     }
 
-    public void ResetBattleCamRotateAxisToForward(float duration)
-    {
-        if (_battleCameraCtrl == null) return;
-        _battleCameraCtrl.ResetRotateAxisToForward(duration);
-    }
+    ReactiveProperty<CameraController.CameraData> _nowCamTypeRP = new();
+    public System.IObservable<CameraController.CameraData> NowCamTypeRP => _nowCamTypeRP;
 
-    ReactiveProperty<BattleCameraController.CameraData> _nowBattleCamTypeRP = new();
-    public System.IObservable<BattleCameraController.CameraData> NowBattleCamTypeRP => _nowBattleCamTypeRP;
-
-
-    BattleCameraController.CameraData CurrentCamData
+    CameraController.CameraData CurrentCamData
     {
         get
         {
-            if (_currentBattleCameraTarget == null) return null;
-            return _battleCameraCtrl.CurrentNormalCamData;
+            if (_currentCameraTarget == null) return null;
+            return _CameraCtrl.CurrentNormalCamData;
         }
     }
 
@@ -108,7 +84,6 @@ public class CameraManager// : GameMonoBehaviour, ICameraManager//, Cinemachine.
     [SerializeField] RectTransform _uiRectTransform;
 
     [SerializeField] Transform _virtualCameraParent;
-
 
     //======================================
     // 複数メインカメラ管理
@@ -235,17 +210,15 @@ public class CameraManager// : GameMonoBehaviour, ICameraManager//, Cinemachine.
         return old;
     }
 
-    override protected void Start()
+    void Start()
     {
-        base.Start();
-
         // バトルカメラが変更された
-        this.ObserveEveryValueChanged(x => _battleCameraCtrl)
+        this.ObserveEveryValueChanged(x => _CameraCtrl)
             .Subscribe(ctrl =>
             {
-                if (_battleCameraCtrl != null)
+                if (_CameraCtrl != null)
                 {
-                    _battleCameraCtrl.SetCameraTarget(_currentBattleCameraTarget);
+                    _CameraCtrl.SetCameraTarget(_currentCameraTarget);
                 }
             });
 
@@ -253,9 +226,7 @@ public class CameraManager// : GameMonoBehaviour, ICameraManager//, Cinemachine.
         this.ObserveEveryValueChanged(x => CurrentCamData)
             .Subscribe(camData =>
             {
-                _nowBattleCamTypeRP.Value = camData;
-                //                _onBattleCameraTypeChanged.OnNext(type);
+                _nowCamTypeRP.Value = camData;
             });
     }
-*/
 }
