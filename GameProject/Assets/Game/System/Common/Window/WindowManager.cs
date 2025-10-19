@@ -7,7 +7,6 @@ using UnityEngine;
 
 namespace WindowSystem
 {
-
     /// <summary>
     /// ウィンドウ管理クラス
     /// </summary>
@@ -27,7 +26,6 @@ namespace WindowSystem
 
             Instance = this;
             Initialize();
-//            DontDestroyOnLoad(gameObject);
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
