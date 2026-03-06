@@ -1,6 +1,6 @@
 //==================================================================
 /// <summary>
-/// ƒJƒƒ‰§ŒäƒNƒ‰ƒX
+/// ã‚«ãƒ¡ãƒ©åˆ¶å¾¡ã‚¯ãƒ©ã‚¹
 /// </summary>
 //==================================================================
 using System.Collections;
@@ -20,13 +20,13 @@ namespace SGGames.Game.Sys
         private CameraData[] m_CameraTable;
 
         // 
-        [Header("¦Normal Camera‚Ì‚İ‚ÌIndex")]
+        [Header("â€»Normal Cameraã®ã¿ã®Index")]
         [SerializeField] int _nowNormalCameraIndex = 0;
 
         /// <summary>
-        /// ‘ÎÛ‚ÌƒJƒƒ‰æ“¾
+        /// å¯¾è±¡ã®ã‚«ãƒ¡ãƒ©å–å¾—
         /// </summary>
-        /// <param name="camid">ƒJƒƒ‰ID</param>
+        /// <param name="camid">ã‚«ãƒ¡ãƒ©ID</param>
         /// <returns></returns>
         public CameraData GetCamera(CameraData.eCameraID camid)
         {
@@ -36,22 +36,22 @@ namespace SGGames.Game.Sys
         public CameraData DemoCamera    { get { return m_CameraTable[(int)CameraData.eCameraID.Demo]; } }
         public CameraData FreeCamera    { get { return m_CameraTable[(int)CameraData.eCameraID.Free]; } }
 
-        // ‘S‚Ä‚ÌƒJƒƒ‰‘ÎÛ‚ÌŒ»İ‚ÌƒJƒƒ‰
+        // å…¨ã¦ã®ã‚«ãƒ¡ãƒ©å¯¾è±¡ã®ç¾åœ¨ã®ã‚«ãƒ¡ãƒ©
         public ReactiveProperty<CameraData> CurrentCamData { get; set; } = new();
-        // NormaCameraê—p‚ÌŒ»İ‚ÌƒJƒƒ‰
+        // NormaCameraå°‚ç”¨ã®ç¾åœ¨ã®ã‚«ãƒ¡ãƒ©
         public CameraData               CurrentNormalCamData    => m_CameraTable[_nowNormalCameraIndex];
         public CinemachineVirtualCamera CurrentVCam             => m_CameraTable[_nowNormalCameraIndex].VCam;
 
         void Awake()
         {
-            // ‰Šúİ’è
+            // åˆæœŸè¨­å®š
             for (int i = 0; i < m_CameraTable.Length; i++)
             {
                 m_CameraTable[i].Initialize(this);
             }
         }
 
-        // qGameObject‚ÌVirtualCamera‚ÉAtarget‚ğİ’è
+        // å­GameObjectã®VirtualCameraã«ã€targetã‚’è¨­å®š
         public void SetCameraTarget(Transform target)
         {
             foreach (var vcamData in m_CameraTable)
@@ -77,8 +77,8 @@ namespace SGGames.Game.Sys
             public CameraController m_OwnerCtrl { get; private set; }
 
             /// <summary>
-            /// ƒJƒƒ‰ID
-            /// m_CameraTable‚É“o˜^‚³‚ê‚Ä‚¢‚éƒJƒƒ‰‡
+            /// ã‚«ãƒ¡ãƒ©ID
+            /// m_CameraTableã«ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã‚«ãƒ¡ãƒ©é †
             /// </summary>
             public enum eCameraID
             {

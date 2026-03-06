@@ -8,19 +8,19 @@ using UnityEngine;
 namespace WindowSystem
 {
     /// <summary>
-    /// ƒ|ƒbƒvƒAƒbƒvƒEƒBƒ“ƒhƒEŠî–{ƒNƒ‰ƒX
+    /// ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦åŸºæœ¬ã‚¯ãƒ©ã‚¹
     /// </summary>
     public abstract class PopupWindow : WindowBase
     {
-        // UI‚ÌTop‚ÌTransform
+        // UIã®Topã®Transform
         [SerializeField] RectTransform _topUITransform;
         public RectTransform TopUITransform => _topUITransform;
 
-        // ‘I‘ğƒOƒ‹[ƒv
+        // é¸æŠã‚°ãƒ«ãƒ¼ãƒ—
         [SerializeField] UISelectableGroup _selectableGroup;
         public UISelectableGroup SelectableGroup => _selectableGroup;
 
-        // “ü—Íƒ}ƒbƒv–¼
+        // å…¥åŠ›ãƒãƒƒãƒ—å
         [SerializeField] string _inputActionMap = "UI";
         public string InputActionMap => _inputActionMap;
 
@@ -55,23 +55,23 @@ namespace WindowSystem
             await TopUITransform.DOLocalMoveY(-500, 0.1f).SetRelative();
         }
 
-        // XVˆ—‚ÉÀs‚³‚ê‚é
+        // æ›´æ–°å‡¦ç†æ™‚ã«å®Ÿè¡Œã•ã‚Œã‚‹
         public virtual async UniTask OnUpdate()
         {
 
         }
 
-        // Œˆ’è‚ÉÀs‚³‚ê‚é
-        // –ß‚è’lFfalsecƒEƒBƒ“ƒhƒE•Â‚¶‚é
+        // æ±ºå®šæ™‚ã«å®Ÿè¡Œã•ã‚Œã‚‹
+        // æˆ»ã‚Šå€¤ï¼šfalseâ€¦ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦é–‰ã˜ã‚‹
         public virtual async UniTask<bool> OnDecide(UISelectable selectable)
         {
             return true;
         }
 
         /// <summary>
-        /// ˆ—
+        /// å‡¦ç†
         /// </summary>
-        /// <returns>‰Ÿ‚µ‚½ƒ{ƒ^ƒ“‚ÌID</returns>
+        /// <returns>æŠ¼ã—ãŸãƒœã‚¿ãƒ³ã®ID</returns>
         public async UniTask<(int IDInt, string IDString)> Run()
         {
             var cancelToken = this.GetCancellationTokenOnDestroy();
@@ -79,24 +79,24 @@ namespace WindowSystem
             // 
             await _selectableGroup.WaitForInitialized();
 
-            // ˆ—
+            // å‡¦ç†
             while (cancelToken.IsCancellationRequested == false)
             {
-                // ƒJ[ƒ\ƒ‹ˆ—
+                // ã‚«ãƒ¼ã‚½ãƒ«å‡¦ç†
                 var retCursor = await _selectableGroup.UpdateCursor();
 
-                // ˆ—Às
+                // å‡¦ç†å®Ÿè¡Œ
                 await OnUpdate();
 
-                // Œˆ’è
+                // æ±ºå®š
                 if (retCursor.action == UISelectable.Actions.Decide)
                 {
-                    // Œˆ’èˆ—
+                    // æ±ºå®šå‡¦ç†
                     if(await OnDecide(retCursor.select) == false)
                     {
-                        // ƒEƒBƒ“ƒhƒE•Â‚¶‚é
+                        // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦é–‰ã˜ã‚‹
                         await CloseWindow();
-                        // Œ‹‰Ê‚ğ•Ô‚·
+                        // çµæœã‚’è¿”ã™
                         return (retCursor.select.IDInt, retCursor.select.IDString);
                     }
                 }

@@ -1,6 +1,6 @@
 //==================================================================
 /// <summary>
-/// ’Pˆê‚ÌƒƒCƒ“ƒJƒƒ‰‚Æ‚µ‚Ä“®ì‚³‚¹‚éƒNƒ‰ƒX
+/// å˜ä¸€ã®ãƒ¡ã‚¤ãƒ³ã‚«ãƒ¡ãƒ©ã¨ã—ã¦å‹•ä½œã•ã›ã‚‹ã‚¯ãƒ©ã‚¹
 /// </summary>
 //==================================================================
 using UnityEngine;
@@ -8,15 +8,15 @@ using UniRx;
 
 public class ManagedMainCamera : MonoBehaviour
 {
-    [Header("—Dæ‡ˆÊ")]
+    [Header("å„ªå…ˆé †ä½")]
     [SerializeField] int _priority = 0;
     public int Priority => _priority;
 
-    // ƒJƒƒ‰‚Ö‚ÌŽQÆ
+    // ã‚«ãƒ¡ãƒ©ã¸ã®å‚ç…§
     Camera _camera;
     public Camera Cam => _camera;
 
-    // —LŒø/–³ŒøŽž‚ÉAƒJƒƒ‰ƒ}ƒl[ƒWƒƒ‚Ö“o˜^/‰ðœ‚âXVˆ—‚ðs‚¤
+    // æœ‰åŠ¹/ç„¡åŠ¹æ™‚ã«ã€ã‚«ãƒ¡ãƒ©ãƒžãƒãƒ¼ã‚¸ãƒ£ã¸ç™»éŒ²/è§£é™¤ã‚„æ›´æ–°å‡¦ç†ã‚’è¡Œã†
     private void OnEnable()
     {
         ICameraManager.Instance.ManageMainCamera(this);
@@ -29,9 +29,9 @@ public class ManagedMainCamera : MonoBehaviour
     void Awake()
     {
         TryGetComponent(out _camera);
-        Debug.Assert(_camera != null, "Camera‚ªƒAƒ^ƒbƒ`‚³‚ê‚Ä‚¢‚È‚¢I");
+        Debug.Assert(_camera != null, "CameraãŒã‚¢ã‚¿ãƒƒãƒã•ã‚Œã¦ã„ãªã„ï¼");
 
-        // ƒJƒƒ‰‚Ìenabled‚ðŠÄŽ‹‚µAXVˆ—‚ð‚³‚¹‚é
+        // ã‚«ãƒ¡ãƒ©ã®enabledã‚’ç›£è¦–ã—ã€æ›´æ–°å‡¦ç†ã‚’ã•ã›ã‚‹
         this.ObserveEveryValueChanged(x => _camera.enabled)
             .Subscribe(enabled =>
             {

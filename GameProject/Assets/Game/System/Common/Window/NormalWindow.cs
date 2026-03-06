@@ -4,7 +4,7 @@ namespace WindowSystem
 {
     public class NormalWindow : MonoBehaviour
     {
-        // “ü—Íƒ}ƒbƒv–¼
+        // å…¥åŠ›ãƒžãƒƒãƒ—å
         [SerializeField] string _inputActionMap = "";
         public string InputActionMap => _inputActionMap;
 

@@ -1,6 +1,6 @@
 //==================================================================
 /// <summary>
-/// ƒJƒƒ‰ŠÇ—ƒNƒ‰ƒX
+/// ã‚«ãƒ¡ãƒ©ç®¡ç†ã‚¯ãƒ©ã‚¹
 /// </summary>
 //==================================================================
 using SGGames.Game.Sys;
@@ -13,7 +13,7 @@ using UnityEngine.Rendering.Universal;
 public interface ICameraManager : IService<ICameraManager>
 {
     //======================================
-    // ƒvƒŒƒCƒ„[ƒJƒƒ‰ŠÖŒW
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚«ãƒ¡ãƒ©é–¢ä¿‚
     //======================================
     Transform CurrentCameraTarget { get; }
     void SetCameraTarget(Transform target);
@@ -26,7 +26,7 @@ public interface ICameraManager : IService<ICameraManager>
     Camera UICamera             { get; }
     Camera CurrentMainCamera    { get; }
 
-    // ƒ[ƒ‹ƒhÀ•W‚©‚çUIÀ•W‚Ö•ÏŠ·
+    // ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã‹ã‚‰UIåº§æ¨™ã¸å¤‰æ›
     Vector2? ConvertWorldToUIPos(Vector3 worldPos) { return Vector2.zero; }
 
     void ManageMainCamera(ManagedMainCamera camera);
@@ -38,7 +38,7 @@ public interface ICameraManager : IService<ICameraManager>
 public class CameraManager : MonoBehaviour, ICameraManager
 {
     //======================================
-    // ƒvƒŒƒCƒ„[ƒJƒƒ‰ŠÖŒW
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚«ãƒ¡ãƒ©é–¢ä¿‚
     //======================================
     Transform _currentCameraTarget;
     public Transform CurrentCameraTarget => _currentCameraTarget;
@@ -74,25 +74,25 @@ public class CameraManager : MonoBehaviour, ICameraManager
         }
     }
 
-    // UIƒJƒƒ‰
+    // UIã‚«ãƒ¡ãƒ©
     Camera _uiCamera;
     public Camera UICamera => _uiCamera;
 
     [SerializeField] List<Canvas> _uiCanvasList;
 
-    // ƒ[ƒ‹ƒh->UIÀ•W•ÏŠ·—p
+    // ãƒ¯ãƒ¼ãƒ«ãƒ‰->UIåº§æ¨™å¤‰æ›ç”¨
     [SerializeField] RectTransform _uiRectTransform;
 
     [SerializeField] Transform _virtualCameraParent;
 
     //======================================
-    // •¡”ƒƒCƒ“ƒJƒƒ‰ŠÇ—
-    // EƒƒCƒ“ƒJƒƒ‰‚Í‚P‚Â‚¾‚¯—LŒø‚É‚µ‚ÄA‘¼‚ğ–³Œø‚É‚·‚é‚½‚ßB
+    // è¤‡æ•°ãƒ¡ã‚¤ãƒ³ã‚«ãƒ¡ãƒ©ç®¡ç†
+    // ãƒ»ãƒ¡ã‚¤ãƒ³ã‚«ãƒ¡ãƒ©ã¯ï¼‘ã¤ã ã‘æœ‰åŠ¹ã«ã—ã¦ã€ä»–ã‚’ç„¡åŠ¹ã«ã™ã‚‹ãŸã‚ã€‚
     //======================================
-    // ƒƒCƒ“ƒJƒƒ‰ŠÇ—ƒŠƒXƒg
+    // ãƒ¡ã‚¤ãƒ³ã‚«ãƒ¡ãƒ©ç®¡ç†ãƒªã‚¹ãƒˆ
     List<ManagedMainCamera> _managedMainCameraList = new();
     HashSet<ManagedMainCamera> _managedMainCameras = new();
-    // Œ»İ‚ÌƒƒCƒ“ƒJƒƒ‰
+    // ç¾åœ¨ã®ãƒ¡ã‚¤ãƒ³ã‚«ãƒ¡ãƒ©
     ManagedMainCamera _currentMainCamera;
     public Camera CurrentMainCamera
     {
@@ -104,7 +104,7 @@ public class CameraManager : MonoBehaviour, ICameraManager
     }
     public ManagedMainCamera CurrentMainCamera2 => _currentMainCamera;
 
-    // ƒ[ƒ‹ƒhÀ•W‚©‚çUIÀ•W‚Ö•ÏŠ·
+    // ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã‹ã‚‰UIåº§æ¨™ã¸å¤‰æ›
     public Vector2? ConvertWorldToUIPos(Vector3 worldPos)
     {
         Vector3 vTarget = worldPos - _currentMainCamera.Cam.transform.position;
@@ -118,48 +118,48 @@ public class CameraManager : MonoBehaviour, ICameraManager
         return pos;
     }
 
-    // ƒƒCƒ“ƒJƒƒ‰“o˜^
+    // ãƒ¡ã‚¤ãƒ³ã‚«ãƒ¡ãƒ©ç™»éŒ²
     public void ManageMainCamera(ManagedMainCamera mainCamera)
     {
         _managedMainCameras.Remove(mainCamera);
 
         _managedMainCameras.Add(mainCamera);
 
-        // XV
+        // æ›´æ–°
         UpdateManagedMainCameraList();
     }
 
-    // ƒƒCƒ“ƒJƒƒ‰“o˜^‰ğœ
+    // ãƒ¡ã‚¤ãƒ³ã‚«ãƒ¡ãƒ©ç™»éŒ²è§£é™¤
     public void UnmanageMainCamera(ManagedMainCamera mainCamera)
     {
         _managedMainCameras.Remove(mainCamera);
 
-        // XV
+        // æ›´æ–°
         UpdateManagedMainCameraList();
     }
 
     /// <summary>
-    /// ƒƒCƒ“ƒJƒƒ‰ƒŠƒXƒg‚ÌXVˆ—
-    /// Enullƒ`ƒFƒbƒN
-    /// EƒJƒŒƒ“ƒgƒƒCƒ“ƒJƒƒ‰ŒŸõ•—LŒø/–³Œø‰»
+    /// ãƒ¡ã‚¤ãƒ³ã‚«ãƒ¡ãƒ©ãƒªã‚¹ãƒˆã®æ›´æ–°å‡¦ç†
+    /// ãƒ»nullãƒã‚§ãƒƒã‚¯
+    /// ãƒ»ã‚«ãƒ¬ãƒ³ãƒˆãƒ¡ã‚¤ãƒ³ã‚«ãƒ¡ãƒ©æ¤œç´¢ï¼†æœ‰åŠ¹/ç„¡åŠ¹åŒ–
     /// </summary>
     public void UpdateManagedMainCameraList()
     {
         _currentMainCamera = null;
 
-        // null‚Ì•¨‚ğíœ
+        // nullã®ç‰©ã‚’å‰Šé™¤
         _managedMainCameras.RemoveWhere(x => x == null);
 
-        // Å—DæƒJƒƒ‰ŒŸõ
+        // æœ€å„ªå…ˆã‚«ãƒ¡ãƒ©æ¤œç´¢
         foreach (var managedCam in _managedMainCameras)
         {
-            // ManageCamera©‘Ì‚ª–³Œø‚È‚çA–³‹‚·‚é
+            // ManageCameraè‡ªä½“ãŒç„¡åŠ¹ãªã‚‰ã€ç„¡è¦–ã™ã‚‹
             if (managedCam.enabled == false)
             {
                 continue;
             }
 
-            // Å‚à—Dæ‡ˆÊ‚Ì‚‚¢ƒJƒƒ‰‚ğc‚·
+            // æœ€ã‚‚å„ªå…ˆé †ä½ã®é«˜ã„ã‚«ãƒ¡ãƒ©ã‚’æ®‹ã™
             if (_currentMainCamera == null)
             {
                 _currentMainCamera = managedCam;
@@ -170,7 +170,7 @@ public class CameraManager : MonoBehaviour, ICameraManager
             }
         }
 
-        // Å—DæƒJƒƒ‰‚Ì‚İ—LŒøA‚»‚Ì‘¼‚Í‚·‚×‚Ä–³Œø
+        // æœ€å„ªå…ˆã‚«ãƒ¡ãƒ©ã®ã¿æœ‰åŠ¹ã€ãã®ä»–ã¯ã™ã¹ã¦ç„¡åŠ¹
         foreach (var managedCam in _managedMainCameras)
         {
             if (_currentMainCamera == managedCam)
@@ -212,7 +212,7 @@ public class CameraManager : MonoBehaviour, ICameraManager
 
     void Start()
     {
-        // ƒoƒgƒ‹ƒJƒƒ‰‚ª•ÏX‚³‚ê‚½
+        // ãƒãƒˆãƒ«ã‚«ãƒ¡ãƒ©ãŒå¤‰æ›´ã•ã‚ŒãŸ
         this.ObserveEveryValueChanged(x => _CameraCtrl)
             .Subscribe(ctrl =>
             {

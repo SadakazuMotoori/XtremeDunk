@@ -18,23 +18,23 @@ namespace WindowSystem
         //
         //=============================================
 
-        // ƒEƒBƒ“ƒhƒE‚Ìí—Ş
+        // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ç¨®é¡
         public enum WindowStates
         {
-            None,           // ‰Šú‰»‘O
-            Initializing,   // ‰Šú‰»’†
-            Initialized,    // ‰Šú‰»I—¹
-            Showing,        // •\¦ˆ—’†
-            Shown,          // •\¦‚³‚ê‚½
-            Closeing,       // I—¹’†
+            None,           // åˆæœŸåŒ–å‰
+            Initializing,   // åˆæœŸåŒ–ä¸­
+            Initialized,    // åˆæœŸåŒ–çµ‚äº†
+            Showing,        // è¡¨ç¤ºå‡¦ç†ä¸­
+            Shown,          // è¡¨ç¤ºã•ã‚ŒãŸ
+            Closeing,       // çµ‚äº†ä¸­
         }
-        // Œ»İ‚ÌƒEƒBƒ“ƒhƒE‚Ìˆ—ó‘Ô
+        // ç¾åœ¨ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å‡¦ç†çŠ¶æ…‹
         public WindowStates NowState { get; set; } = WindowStates.None;
 
-        // •\¦ó‘Ô‚Ü‚Å‘Ò‚Â
+        // è¡¨ç¤ºçŠ¶æ…‹ã¾ã§å¾…ã¤
         public async UniTask WaitForShown() => await UniTask.WaitUntil(() => NowState == WindowStates.Shown);
 
-        // ƒEƒBƒ“ƒhƒE‚ğ•Â‚¶‚é
+        // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’é–‰ã˜ã‚‹
         public async UniTask CloseWindow()
         {
             await WindowManager.Instance.CloseWindow(this);
@@ -42,24 +42,24 @@ namespace WindowSystem
 
         //=============================================
         //
-        // ƒCƒxƒ“ƒgŠÖ”
+        // ã‚¤ãƒ™ãƒ³ãƒˆé–¢æ•°
         //
         //=============================================
 
         /// <summary>
-        /// (”ñActive)‰Šúˆ—
+        /// (éActive)åˆæœŸå‡¦ç†
         /// </summary>
         /// <returns></returns>
         public virtual UniTask OnInitialize() => UniTask.CompletedTask;
 
         /// <summary>
-        /// (Active)‰Šúˆ—
+        /// (Active)åˆæœŸå‡¦ç†
         /// </summary>
         /// <returns></returns>
         public virtual UniTask OnShow() => UniTask.CompletedTask;
 
         /// <summary>
-        /// ‘O‚ÌƒXƒNƒŠ[ƒ“‚É–ß‚èA”jŠü‚³‚ê‚é’¼‘O‚ÉÀs
+        /// å‰ã®ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã«æˆ»ã‚Šã€ç ´æ£„ã•ã‚Œã‚‹ç›´å‰ã«å®Ÿè¡Œ
         /// </summary>
         /// <returns></returns>
         public virtual UniTask OnClose() => UniTask.CompletedTask;

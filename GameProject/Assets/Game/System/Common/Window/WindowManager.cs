@@ -8,7 +8,7 @@ using UnityEngine;
 namespace WindowSystem
 {
     /// <summary>
-    /// ƒEƒBƒ“ƒhƒEŠÇ—ƒNƒ‰ƒX
+    /// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç®¡ç†ã‚¯ãƒ©ã‚¹
     /// </summary>
     [DefaultExecutionOrder(-100000)]
     public class WindowManager : MonoBehaviour
@@ -35,10 +35,10 @@ namespace WindowSystem
         }
         #endregion
 
-        [Header("QÆ")]
+        [Header("å‚ç…§")]
         [SerializeField] Transform _popupWindowGroup;
 
-        // ˆÃ–‹‚Ö‚ÌQÆ
+        // æš—å¹•ã¸ã®å‚ç…§
         [SerializeField] UnityEngine.UI.Image _imgBlackCurtrain;
         Tween _tweenBlackCurtain;
 
@@ -57,10 +57,10 @@ namespace WindowSystem
             {
                 if (_popupWindowGroup.childCount == 0)
                 {
-                    // ƒm[ƒ}ƒ‹ƒEƒBƒ“ƒhƒE‚ª‘¶İ‚·‚é‚È‚çA‚»‚ê‚Ìİ’è‚ğg—p
+                    // ãƒãƒ¼ãƒãƒ«ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒå­˜åœ¨ã™ã‚‹ãªã‚‰ã€ãã‚Œã®è¨­å®šã‚’ä½¿ç”¨
                     if (_currentNormalWindow != null)
                     {
-                        // •¶š—ñ‚ª‚ ‚é‚¾‚¯
+                        // æ–‡å­—åˆ—ãŒã‚ã‚‹æ™‚ã ã‘
                         if (string.IsNullOrEmpty(_currentNormalWindow.InputActionMap) == false)
                         {
                             PlayerInputManager.Instance.SwitchCurrentActionMap(_currentNormalWindow.InputActionMap);
@@ -68,19 +68,19 @@ namespace WindowSystem
                     }
                     else
                     {
-                        // ƒfƒtƒHƒ‹ƒg‚É–ß‚·
+                        // ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã«æˆ»ã™
                         PlayerInputManager.Instance.SwitchCurrentActionMap(null);
                     }
                 }
                 else
                 {
-                    // ˆê”Ôã‚ÌƒEƒBƒ“ƒhƒE‚ÌActionMap‚É‚·‚é
+                    // ä¸€ç•ªä¸Šã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ActionMapã«ã™ã‚‹
                     for (int iChild = _popupWindowGroup.childCount - 1; iChild >= 0; iChild--)
                     {
                         var puWnd = _popupWindowGroup.GetChild(iChild).GetComponent<PopupWindow>();
                         if (puWnd == null) continue;
 
-                        // •¶š—ñ‚ª‚ ‚é‚¾‚¯
+                        // æ–‡å­—åˆ—ãŒã‚ã‚‹æ™‚ã ã‘
                         if (string.IsNullOrEmpty(puWnd.InputActionMap) == false)
                         {
                             PlayerInputManager.Instance.SwitchCurrentActionMap(puWnd.InputActionMap);
@@ -91,7 +91,7 @@ namespace WindowSystem
             }
 
             //-------------------------------------------------
-            // qƒEƒBƒ“ƒhƒE‚Ì”‚ª•Ï‰»AInputActionMap‚ğ•ÏX
+            // å­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®æ•°ãŒå¤‰åŒ–æ™‚ã€InputActionMapã‚’å¤‰æ›´
             //-------------------------------------------------
             _popupWindowGroup.OnTransformChildrenChangedAsObservable()
                 .Subscribe(_ =>
@@ -100,7 +100,7 @@ namespace WindowSystem
                 }).AddTo(this);
 
             //-------------------------------------------------
-            // ƒm[ƒ}ƒ‹ƒEƒBƒ“ƒhƒE‚ª•ÏX‚³‚ê‚½
+            // ãƒãƒ¼ãƒãƒ«ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒå¤‰æ›´ã•ã‚ŒãŸæ™‚
             //-------------------------------------------------
             Observable.EveryValueChanged(this, x => _currentNormalWindow)
                 .Subscribe(_ =>
@@ -116,99 +116,99 @@ namespace WindowSystem
         }
 
         /// <summary>
-        /// ƒEƒBƒ“ƒhƒE¶¬
+        /// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç”Ÿæˆ
         /// </summary>
         /// <typeparam name="TWindow"></typeparam>
-        /// <param name="assetAddress">ì¬‚·‚éƒEƒBƒ“ƒhƒEƒAƒZƒbƒg</param>
-        /// <param name="onInitialize">ƒEƒBƒ“ƒhƒE‚ÌOnInitialize‘O‚ÉÀs‚³‚ê‚éŠÖ”</param>
+        /// <param name="assetAddress">ä½œæˆã™ã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¢ã‚»ãƒƒãƒˆ</param>
+        /// <param name="onInitialize">ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®OnInitializeå‰ã«å®Ÿè¡Œã•ã‚Œã‚‹é–¢æ•°</param>
         /// <returns></returns>
         public async UniTask<TWindow> CreateWindow<TWindow>(object assetAddress, System.Func<TWindow, UniTask> onInitialize) where TWindow : WindowBase
         {
-            // ƒAƒZƒbƒgƒ[ƒh
+            // ã‚¢ã‚»ãƒƒãƒˆãƒ­ãƒ¼ãƒ‰
             var handle = UnityEngine.AddressableAssets.Addressables.LoadAssetAsync<GameObject>(assetAddress);
-            // ƒ[ƒh‘Ò‚¿
+            // ãƒ­ãƒ¼ãƒ‰å¾…ã¡
             var asset = await handle;
             if(asset == null)
             {
                 return null;
             }
 
-            // eGameObject
+            // è¦ªGameObject
             Transform parent = _popupWindowGroup;
 
-            // ƒEƒBƒ“ƒhƒEì¬
+            // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½œæˆ
             var goWindow = Instantiate(asset, parent);
             var window = goWindow.GetComponent<TWindow>();
 
-            // ƒEƒBƒ“ƒhƒE”jŠü‚³‚ê‚é‚ÉAƒAƒZƒbƒgƒnƒ“ƒhƒ‹‚à‰ğ•ú‚³‚ê‚é‚æ‚¤‚É“o˜^
+            // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç ´æ£„ã•ã‚Œã‚‹æ™‚ã«ã€ã‚¢ã‚»ãƒƒãƒˆãƒãƒ³ãƒ‰ãƒ«ã‚‚è§£æ”¾ã•ã‚Œã‚‹ã‚ˆã†ã«ç™»éŒ²
             goWindow.OnDestroyAsObservable()
                 .Subscribe(_ =>
                 {
                     UnityEngine.AddressableAssets.Addressables.Release(handle);
                 });
 
-            // ƒEƒBƒ“ƒhƒE‰Šúİ’è
+            // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦åˆæœŸè¨­å®š
             await InitWindow(window, onInitialize);
 
             return window;
         }
 
         /// <summary>
-        /// ƒEƒBƒ“ƒhƒE‚ğ‰Šúİ’è
+        /// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’åˆæœŸè¨­å®š
         /// </summary>
         /// <param name="window"></param>
         /// <returns></returns>
         async UniTask InitWindow<TWindow>(TWindow window, System.Func<TWindow, UniTask> onInitialize) where TWindow : WindowBase
         {
             //-----------------------------
-            // ”ñ•\¦ó‘Ô‚Å‚Ì‰Šú‰»ˆ—
+            // éè¡¨ç¤ºçŠ¶æ…‹ã§ã®åˆæœŸåŒ–å‡¦ç†
             //-----------------------------
-            // ”ñ•\¦‚É‚·‚é
+            // éè¡¨ç¤ºã«ã™ã‚‹
             window.gameObject.SetActive(false);
 
             window.NowState = WindowBase.WindowStates.Initializing;
-            // ˆø”‚µ‚Ä‚¢ŠO•”ŠÖ”‚ğÀs
+            // å¼•æ•°ã—ã¦ã„å¤–éƒ¨é–¢æ•°ã‚’å®Ÿè¡Œ
             if(onInitialize != null)
             {
                 await onInitialize(window);
             }
-            // ƒEƒBƒ“ƒhƒE‚Ì‰Šú‰»ŠÖ”‚ğÀs
+            // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®åˆæœŸåŒ–é–¢æ•°ã‚’å®Ÿè¡Œ
             await window.OnInitialize();
             window.NowState = WindowBase.WindowStates.Initialized;
 
             //-----------------------------
-            // •\¦ó‘Ô‚Å‚Ì‰Šú‰»ˆ—
+            // è¡¨ç¤ºçŠ¶æ…‹ã§ã®åˆæœŸåŒ–å‡¦ç†
             //-----------------------------
-            // •\¦
+            // è¡¨ç¤º
             window.gameObject.SetActive(true);
 
             window.NowState = WindowBase.WindowStates.Showing;
-            // ƒEƒBƒ“ƒhƒE‚Ì•\¦ŠÖ”‚ğÀs
+            // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è¡¨ç¤ºé–¢æ•°ã‚’å®Ÿè¡Œ
             await window.OnShow();
             window.NowState = WindowBase.WindowStates.Shown;
         }
 
         /// <summary>
-        /// ƒEƒBƒ“ƒhƒE‚ğ•Â‚¶‚é
+        /// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’é–‰ã˜ã‚‹
         /// </summary>
         /// <param name="window"></param>
         /// <returns></returns>
         public async UniTask CloseWindow(WindowBase window)
         {
-            // Šù‚Éñ—Ì’†
+            // æ—¢ã«é¦–é ˜ä¸­
             if (window.NowState == WindowBase.WindowStates.Closeing) return;
 
-            // •\¦ó‘Ô‚Ü‚Å‘Ò‚Â
+            // è¡¨ç¤ºçŠ¶æ…‹ã¾ã§å¾…ã¤
             await window.WaitForShown();
 
 
             //-----------------------------
-            // ”jŠü‚Ìˆ—
+            // ç ´æ£„æ™‚ã®å‡¦ç†
             //-----------------------------
             window.NowState = WindowBase.WindowStates.Closeing;
             await window.OnClose();
 
-            // ”jŠü
+            // ç ´æ£„
             Destroy(window.gameObject);
         }
     }

@@ -1,45 +1,73 @@
 //========================================================
 /// <summary>
-/// �T�[�r�X���P�[�^
+/// サービスロケータ
 /// </summary>
 //========================================================
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-public static class ServiceLocator<T> where T : class
+/// <summary>
+/// ServiceLocator の状態をロード時にリセットするための非ジェネリック初期化クラス
+/// </summary>
+public static class ServiceLocatorRuntimeReset
 {
-    //�T�[�r�X�̕ێ��E�擾
-    public static T Instance { private set; get; }
-
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void Init()
     {
-        Instance = null;
+        ServiceLocator.Reset();
+    }
+}
+
+/// <summary>
+/// 非ジェネリック実体（全サービスを一括管理）
+/// </summary>
+public static class ServiceLocator
+{
+    static readonly Dictionary<Type, object> s_instances = new();
+
+    public static T Get<T>() where T : class
+    {
+        return s_instances.TryGetValue(typeof(T), out var obj) ? (T)obj : null;
     }
 
-    //�T�[�r�X�̓o�^
+    public static void Register<T>(T instance) where T : class
+    {
+        s_instances[typeof(T)] = instance;
+    }
+
+    public static void Unregister<T>() where T : class
+    {
+        s_instances.Remove(typeof(T));
+    }
+
+    public static void Reset()
+    {
+        s_instances.Clear();
+    }
+}
+
+public static class ServiceLocator<T> where T : class
+{
+    //サービスの保持・取得
+    public static T Instance => ServiceLocator.Get<T>();
+
+    //サービスの登録
     public static void Register(T instance)
     {
-        Instance = instance;
+        ServiceLocator.Register(instance);
     }
-    //�T�[�r�X�̊J��
+    //サービスの開放
     public static void Unregister()
     {
-        Instance = null;
+        ServiceLocator.Unregister<T>();
     }
 }
 
 public interface IService<T> where T : class
 {
-    internal static T _instance = null;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
-    {
-        _instance = null;
-    }
-
     /// <summary>
-    /// �C���X�^���X���擾����(����̂P�x�ڂ̂�ServiceLocator����擾)�B
+    /// インスタンスを取得する(初回の１度目のみServiceLocatorから取得)。
     /// </summary>
     public static T Instance => ServiceLocator<T>.Instance;
 }

@@ -1,13 +1,13 @@
 //==================================================================
 /// <summary>
-/// ŠJ”­”Åx‚Ì‚İRootƒV[ƒ“‚©‚çŒÄ‚Ño‚³‚ê‚éƒfƒoƒbƒO—p‚ÌƒV[ƒ“
+/// é–‹ç™ºç‰ˆxã®ã¿Rootã‚·ãƒ¼ãƒ³ã‹ã‚‰å‘¼ã³å‡ºã•ã‚Œã‚‹ãƒ‡ãƒãƒƒã‚°ç”¨ã®ã‚·ãƒ¼ãƒ³
 /// </summary>
 //==================================================================
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using MackySoft.Navigathena.SceneManagement;
 
-// ƒfƒoƒbƒOƒV[ƒ“‚ÌSceneEntryPoint‚ğÀ‘•‚·‚éƒRƒ“ƒ|[ƒlƒ“ƒg
+// ãƒ‡ãƒãƒƒã‚°ã‚·ãƒ¼ãƒ³ã®SceneEntryPointã‚’å®Ÿè£…ã™ã‚‹ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ
 public sealed class DebugSceneEntoryPoint : SceneEntryPointBase
 {
     protected override async UniTask OnEnter(ISceneDataReader reader, CancellationToken cancellationToken)

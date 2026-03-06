@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// ƒvƒŒƒCƒ„[“ü—ÍŠÇ—
+/// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å…¥åŠ›ç®¡ç†
 /// </summary>
 [DefaultExecutionOrder(-1)]
 public class PlayerInputManager : MonoBehaviour
@@ -67,7 +67,7 @@ public class PlayerInputManager : MonoBehaviour
 
 
     //======================================
-    // “ü—ÍƒfƒoƒCƒX‚Ìí—Ş
+    // å…¥åŠ›ãƒ‡ãƒã‚¤ã‚¹ã®ç¨®é¡
     //======================================
     public enum DevideTypes
     {
@@ -81,23 +81,23 @@ public class PlayerInputManager : MonoBehaviour
     }
     DevideTypes _lastInputDevice = DevideTypes.None;
 
-    // ƒRƒ“ƒgƒ[ƒ‰¯•Ê—p
+    // ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©è­˜åˆ¥ç”¨
     private InputAction _deletectionKeyboard = new InputAction(type: InputActionType.PassThrough, binding: "<Keyboard>/AnyKey", interactions: "Press");
     private InputAction _deletectionXBOX = new InputAction(type: InputActionType.PassThrough, binding: "<XInputController>/*", interactions: "Press");
     private InputAction _deletectionDS = new InputAction(type: InputActionType.PassThrough, binding: "<DualShockGamepad>/*", interactions: "Press");
     private InputAction _deletectionSwitch = new InputAction(type: InputActionType.PassThrough, binding: "<SwitchProControllerHID>/*", interactions: "Press");
 
-    // Œ»İ‚ÍƒL[ƒ}ƒEH
+    // ç¾åœ¨ã¯ã‚­ãƒ¼ãƒã‚¦ï¼Ÿ
     public bool IsNowKeyboardMouseMode => _lastInputDevice == DevideTypes.Keyboard;
 
 
     //======================================
     //
-    // ƒCƒxƒ“ƒg
+    // ã‚¤ãƒ™ãƒ³ãƒˆ
     //
     //======================================
 
-    // “ü—ÍƒfƒoƒCƒX‚ª•ÏX‚³‚ê‚½
+    // å…¥åŠ›ãƒ‡ãƒã‚¤ã‚¹ãŒå¤‰æ›´ã•ã‚ŒãŸæ™‚
     BehaviorSubject<DevideTypes> _onChangeDevice = new(DevideTypes.None);
     public Observable<DevideTypes> OnChangeDevice => _onChangeDevice;
 
@@ -115,7 +115,7 @@ public class PlayerInputManager : MonoBehaviour
         }
         Instance = this;
 
-        // ‰Šúİ’è
+        // åˆæœŸè¨­å®š
         _gameplayAction.Initialize(_playerInput.actions.FindActionMap("Gameplay"));
         _uiAction.Initialize(_playerInput.actions.FindActionMap("UI"));
 
@@ -130,67 +130,67 @@ public class PlayerInputManager : MonoBehaviour
 
     void Update()
     {
-        // “ü—ÍƒfƒoƒCƒX‚Ì”»’è
+        // å…¥åŠ›ãƒ‡ãƒã‚¤ã‚¹ã®åˆ¤å®š
         if (_deletectionKeyboard.triggered || (Mouse.current != null && Mouse.current.delta.magnitude > 0))
         {
             if (_lastInputDevice != DevideTypes.Keyboard)
             {
-                // ƒ}ƒEƒXƒAƒ“ƒƒbƒN’†‚Ìê‡‚ÍAƒJ[ƒ\ƒ‹•\¦
+                // ãƒã‚¦ã‚¹ã‚¢ãƒ³ãƒ­ãƒƒã‚¯ä¸­ã®å ´åˆã¯ã€ã‚«ãƒ¼ã‚½ãƒ«è¡¨ç¤º
                 if (Cursor.lockState == CursorLockMode.None)
                 {
                     Cursor.visible = true;
                 }
 
-                Debug.Log("[InputƒfƒoƒCƒX•ÏX]ƒL[ƒ{[ƒh");
+                Debug.Log("[Inputãƒ‡ãƒã‚¤ã‚¹å¤‰æ›´]ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰");
                 _onChangeDevice.OnNext(DevideTypes.Keyboard);
                 _lastInputDevice = DevideTypes.Keyboard;
             }
         }
 
-        // XBOXƒRƒ“ƒgƒ[ƒ‰[
+        // XBOXã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼
         else if (_deletectionXBOX.triggered)
         {
             if (_lastInputDevice != DevideTypes.XBOX)
             {
-                // ƒ}ƒEƒXƒAƒ“ƒƒbƒN’†‚Ìê‡‚ÍAƒJ[ƒ\ƒ‹”ñ•\¦
+                // ãƒã‚¦ã‚¹ã‚¢ãƒ³ãƒ­ãƒƒã‚¯ä¸­ã®å ´åˆã¯ã€ã‚«ãƒ¼ã‚½ãƒ«éè¡¨ç¤º
                 if (Cursor.lockState == CursorLockMode.None)
                 {
                     Cursor.visible = false;
                 }
 
-                Debug.Log("[InputƒfƒoƒCƒX•ÏX]XBOXƒRƒ“ƒgƒ[ƒ‰");
+                Debug.Log("[Inputãƒ‡ãƒã‚¤ã‚¹å¤‰æ›´]XBOXã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©");
                 _onChangeDevice.OnNext(DevideTypes.XBOX);
                 _lastInputDevice = DevideTypes.XBOX;
             }
         }
-        // PlayStationƒRƒ“ƒgƒ[ƒ‰[
+        // PlayStationã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼
         else if (_deletectionDS.triggered)
         {
             if (_lastInputDevice != DevideTypes.PlayStation)
             {
-                // ƒ}ƒEƒXƒAƒ“ƒƒbƒN’†‚Ìê‡‚ÍAƒJ[ƒ\ƒ‹”ñ•\¦
+                // ãƒã‚¦ã‚¹ã‚¢ãƒ³ãƒ­ãƒƒã‚¯ä¸­ã®å ´åˆã¯ã€ã‚«ãƒ¼ã‚½ãƒ«éè¡¨ç¤º
                 if (Cursor.lockState == CursorLockMode.None)
                 {
                     Cursor.visible = false;
                 }
 
-                Debug.Log("[InputƒfƒoƒCƒX•ÏX]ƒfƒ…ƒAƒ‹ƒVƒ‡ƒbƒN");
+                Debug.Log("[Inputãƒ‡ãƒã‚¤ã‚¹å¤‰æ›´]ãƒ‡ãƒ¥ã‚¢ãƒ«ã‚·ãƒ§ãƒƒã‚¯");
                 _onChangeDevice.OnNext(DevideTypes.PlayStation);
                 _lastInputDevice = DevideTypes.PlayStation;
             }
         }
-        // SwitchƒRƒ“ƒgƒ[ƒ‰[
+        // Switchã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼
         else if (_deletectionSwitch.triggered)
         {
             if (_lastInputDevice != DevideTypes.Switch)
             {
-                // ƒ}ƒEƒXƒAƒ“ƒƒbƒN’†‚Ìê‡‚ÍAƒJ[ƒ\ƒ‹”ñ•\¦
+                // ãƒã‚¦ã‚¹ã‚¢ãƒ³ãƒ­ãƒƒã‚¯ä¸­ã®å ´åˆã¯ã€ã‚«ãƒ¼ã‚½ãƒ«éè¡¨ç¤º
                 if (Cursor.lockState == CursorLockMode.None)
                 {
                     Cursor.visible = false;
                 }
 
-                Debug.Log("[InputƒfƒoƒCƒX•ÏX]SwitchƒRƒ“ƒgƒ[ƒ‰");
+                Debug.Log("[Inputãƒ‡ãƒã‚¤ã‚¹å¤‰æ›´]Switchã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©");
                 _onChangeDevice.OnNext(DevideTypes.Switch);
                 _lastInputDevice = DevideTypes.Switch;
             }
@@ -198,7 +198,7 @@ public class PlayerInputManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ActionMap‚ğ•ÏX
+    /// ActionMapã‚’å¤‰æ›´
     /// </summary>
     public void SwitchCurrentActionMap(string mapName)
     {
