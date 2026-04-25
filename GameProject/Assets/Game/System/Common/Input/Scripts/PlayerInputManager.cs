@@ -9,6 +9,7 @@ using UnityEngine.InputSystem;
 /// <summary>
 /// プレイヤー入力管理
 /// </summary>
+[RequireComponent(typeof(PlayerInput))]
 [DefaultExecutionOrder(-1)]
 public class PlayerInputManager : MonoBehaviour
 {
@@ -40,25 +41,31 @@ public class PlayerInputManager : MonoBehaviour
         InputAction _option1 { get; set; }
         InputAction _option2 { get; set; }
 
-        public bool AxisLeft => _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().x < 0 : false;
-        public bool AxisRight => _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().x > 0 : false;
+        public bool AxisLeft => _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().x < 0 : false;
+        public bool AxisRight => _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().x > 0 : false;
 
-        public bool AxisUp => _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().y > 0 : false;
-        public bool AxisDown => _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().y < 0 : false;
-        public bool IsPressAxis => _axis.ReadValue<Vector2>().sqrMagnitude > 0;
+        public bool AxisUp => _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().y > 0 : false;
+        public bool AxisDown => _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().y < 0 : false;
+        public bool IsPressAxis => _axis != null && _axis.ReadValue<Vector2>().sqrMagnitude > 0;
 
-        public bool Decide => _decide.triggered;
-        public bool Cancel => _cancel.triggered;
-        public bool Option1 => _option1.triggered;
-        public bool Option2 => _option2.triggered;
+        public bool Decide => _decide != null && _decide.triggered;
+        public bool Cancel => _cancel != null && _cancel.triggered;
+        public bool Option1 => _option1 != null && _option1.triggered;
+        public bool Option2 => _option2 != null && _option2.triggered;
 
         public void Initialize(InputActionMap actMap)
         {
-            _axis = actMap["Axis"];
-            _decide = actMap["Decide"];
-            _cancel = actMap["Cancel"];
-            _option1 = actMap["Option1"];
-            _option2 = actMap["Option2"];
+            // ActionMapが未設定でも、UI側がnull参照で止まらないようにする。
+            if (actMap == null)
+            {
+                return;
+            }
+
+            _axis = actMap.FindAction("Axis", false);
+            _decide = actMap.FindAction("Decide", false);
+            _cancel = actMap.FindAction("Cancel", false);
+            _option1 = actMap.FindAction("Option1", false);
+            _option2 = actMap.FindAction("Option2", false);
         }
 
     }
@@ -115,9 +122,22 @@ public class PlayerInputManager : MonoBehaviour
         }
         Instance = this;
 
+        // Prefab側の設定漏れがあっても、同じGameObject上のPlayerInputを自動取得する。
+        if (_playerInput == null)
+        {
+            TryGetComponent(out _playerInput);
+        }
+
+        if (_playerInput == null || _playerInput.actions == null)
+        {
+            Debug.LogError("PlayerInputManagerにPlayerInput、またはInputActionが設定されていません。");
+            enabled = false;
+            return;
+        }
+
         // 初期設定
-        _gameplayAction.Initialize(_playerInput.actions.FindActionMap("Gameplay"));
-        _uiAction.Initialize(_playerInput.actions.FindActionMap("UI"));
+        _gameplayAction.Initialize(_playerInput.actions.FindActionMap("Gameplay", false));
+        _uiAction.Initialize(_playerInput.actions.FindActionMap("UI", false));
 
         //
         _deletectionKeyboard.Enable();
@@ -126,6 +146,21 @@ public class PlayerInputManager : MonoBehaviour
         _deletectionSwitch.Enable();
 
         // 
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+
+        // コードで作成したInputActionは、破棄時に明示的に解放する。
+        _deletectionKeyboard.Dispose();
+        _deletectionXBOX.Dispose();
+        _deletectionDS.Dispose();
+        _deletectionSwitch.Dispose();
+        _onChangeDevice.Dispose();
     }
 
     void Update()
@@ -202,6 +237,11 @@ public class PlayerInputManager : MonoBehaviour
     /// </summary>
     public void SwitchCurrentActionMap(string mapName)
     {
+        if (_playerInput == null)
+        {
+            return;
+        }
+
         if (string.IsNullOrEmpty(mapName) == false)
         {
             _playerInput.SwitchCurrentActionMap(mapName);

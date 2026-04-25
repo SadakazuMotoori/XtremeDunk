@@ -47,6 +47,12 @@ public sealed class RootSceneLifetimeScope : LifetimeScope
     [SerializeField] GameObject _mainCameraPrefab;
     GameObject _mainCameraInstance;
 
+    // RootSceneが起動時に生成するInputManager Prefab。
+    // 入力は全シーン共通で必要になるため、MainCameraと同じくRootSceneで常駐させる。
+    [Header("入力管理システム")]
+    [SerializeField] GameObject _inputManagerPrefab;
+    GameObject _inputManagerInstance;
+
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterSceneLifecycle<RootSceneLifecycle>();
@@ -54,6 +60,7 @@ public sealed class RootSceneLifetimeScope : LifetimeScope
   
     private void Start()
     {
+        InitializeInputManager();
         InitializeMainCamera();
 
         // 製品版ならタイトルシーンへ
@@ -69,6 +76,29 @@ public sealed class RootSceneLifetimeScope : LifetimeScope
             _newScene = new BuiltInSceneIdentifier(_nextSceneName);
             GlobalSceneNavigator.Instance.Replace(_newScene);
         }
+    }
+
+    void InitializeInputManager()
+    {
+        // すでにInputManagerを生成済みなら、二重生成を避ける。
+        if (_inputManagerInstance != null)
+        {
+            return;
+        }
+
+        // 何らかの理由でPlayerInputManagerが先に存在している場合も、重複生成しない。
+        if (PlayerInputManager.Instance != null)
+        {
+            return;
+        }
+
+        if (_inputManagerPrefab == null)
+        {
+            Debug.LogError("InputManager PrefabがRootSceneLifetimeScopeに設定されていません。");
+            return;
+        }
+
+        _inputManagerInstance = Instantiate(_inputManagerPrefab, transform);
     }
 
     void InitializeMainCamera()
