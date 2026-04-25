@@ -2,7 +2,6 @@
 
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.IMGUI.Controls;
 using System.Collections.Generic;
 
 public partial class ProjectDefine : EditorWindow
@@ -73,7 +72,7 @@ public partial class ProjectDefine : EditorWindow
         }
     }
 
-    TreeView    mTreeView;
+    ProjectDefine_TreeView    mTreeView;
     List<ProjectDefine_TreeViewItem> mItemList;
 
     private void OnEnable () {
@@ -257,9 +256,9 @@ public partial class ProjectDefine : EditorWindow
     /// ApplyDefines( defines );
     /// </param>
     private static void ApplyDefines( string defines ) {
-        PlayerSettings.SetScriptingDefineSymbolsForGroup( BuildTargetGroup.iOS, defines );
-        PlayerSettings.SetScriptingDefineSymbolsForGroup( BuildTargetGroup.Android, defines );
-        PlayerSettings.SetScriptingDefineSymbolsForGroup( BuildTargetGroup.Standalone, defines );
+        PlayerSettings.SetScriptingDefineSymbols( UnityEditor.Build.NamedBuildTarget.iOS, defines );
+        PlayerSettings.SetScriptingDefineSymbols( UnityEditor.Build.NamedBuildTarget.Android, defines );
+        PlayerSettings.SetScriptingDefineSymbols( UnityEditor.Build.NamedBuildTarget.Standalone, defines );
     }
 
     /// <summary>

@@ -2,12 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
+using TreeView = UnityEditor.IMGUI.Controls.TreeView<int>;
+using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<int>;
+using TreeViewState = UnityEditor.IMGUI.Controls.TreeViewState<int>;
 
 public class ProjectDefine_TreeView : TreeView
 {
     readonly List<ProjectDefine_TreeViewItem> mList;
-
-    TreeViewState   mTreeViewState;
 
     public ProjectDefine_TreeView( List<ProjectDefine_TreeViewItem> list, TreeViewState state, MultiColumnHeader header ) : base( state, header ) {
         mList = list;
@@ -69,7 +70,7 @@ public class ProjectDefine_TreeView : TreeView
     /// 複数列のTreeView作成
     /// </summary>
     /// <returns></returns>
-    public static TreeView MakeTreeView( List<ProjectDefine_TreeViewItem> itemList ) {
+    public static ProjectDefine_TreeView MakeTreeView( List<ProjectDefine_TreeViewItem> itemList ) {
         var columnNonTitle = new MultiColumnHeaderState.Column() {
             width = 18,
             minWidth = 18,

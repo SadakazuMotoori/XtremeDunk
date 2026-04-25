@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using UnityEditor.IMGUI.Controls;
+using TreeViewItem = UnityEditor.IMGUI.Controls.TreeViewItem<int>;
 
 [System.Serializable]
 public class ProjectDefine_TreeViewItem : TreeViewItem

@@ -10,6 +10,7 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
+// 再設計対象
 public interface ICameraManager : IService<ICameraManager>
 {
     //======================================
@@ -35,6 +36,8 @@ public interface ICameraManager : IService<ICameraManager>
     void UpdateManagedMainCameraList();
 }
 
+// 他のカメラ系コンポーネントより先にServiceLocatorへ登録したいので、実行順を早めている。
+[DefaultExecutionOrder(-10000)]
 public class CameraManager : MonoBehaviour, ICameraManager
 {
     //======================================
@@ -60,6 +63,12 @@ public class CameraManager : MonoBehaviour, ICameraManager
     public void SetCamera(CameraController CamCtrl)
     {
         _CameraCtrl = CamCtrl;
+
+        // CameraControllerが後から有効化された場合でも、すでに設定済みのターゲットを反映する。
+        if (_CameraCtrl != null)
+        {
+            _CameraCtrl.SetCameraTarget(_currentCameraTarget);
+        }
     }
 
     ReactiveProperty<CameraController.CameraData> _nowCamTypeRP = new();
@@ -69,7 +78,9 @@ public class CameraManager : MonoBehaviour, ICameraManager
     {
         get
         {
+            // ターゲットやControllerが未設定の起動直後は、現在カメラをまだ確定できない。
             if (_currentCameraTarget == null) return null;
+            if (_CameraCtrl == null) return null;
             return _CameraCtrl.CurrentNormalCamData;
         }
     }
@@ -83,14 +94,11 @@ public class CameraManager : MonoBehaviour, ICameraManager
     // ワールド->UI座標変換用
     [SerializeField] RectTransform _uiRectTransform;
 
-    [SerializeField] Transform _virtualCameraParent;
-
     //======================================
     // 複数メインカメラ管理
     // ・メインカメラは１つだけ有効にして、他を無効にするため。
     //======================================
     // メインカメラ管理リスト
-    List<ManagedMainCamera> _managedMainCameraList = new();
     HashSet<ManagedMainCamera> _managedMainCameras = new();
     // 現在のメインカメラ
     ManagedMainCamera _currentMainCamera;
@@ -107,6 +115,12 @@ public class CameraManager : MonoBehaviour, ICameraManager
     // ワールド座標からUI座標へ変換
     public Vector2? ConvertWorldToUIPos(Vector3 worldPos)
     {
+        // UI座標変換には「現在のメインカメラ」「UIカメラ」「UI基準Rect」がすべて必要。
+        if (_currentMainCamera == null) return null;
+        if (_currentMainCamera.Cam == null) return null;
+        if (_uiRectTransform == null) return null;
+        if (_uiCamera == null) return null;
+
         Vector3 vTarget = worldPos - _currentMainCamera.Cam.transform.position;
 
         if (Vector3.Dot(vTarget, _currentMainCamera.Cam.transform.forward) < 0) return null;
@@ -121,6 +135,9 @@ public class CameraManager : MonoBehaviour, ICameraManager
     // メインカメラ登録
     public void ManageMainCamera(ManagedMainCamera mainCamera)
     {
+        // OnEnable/Startの実行順によってnullが来ても、管理リストを壊さない。
+        if (mainCamera == null) return;
+
         _managedMainCameras.Remove(mainCamera);
 
         _managedMainCameras.Add(mainCamera);
@@ -132,6 +149,9 @@ public class CameraManager : MonoBehaviour, ICameraManager
     // メインカメラ登録解除
     public void UnmanageMainCamera(ManagedMainCamera mainCamera)
     {
+        // 破棄中や無効化中にnull扱いになっても、安全に無視する。
+        if (mainCamera == null) return;
+
         _managedMainCameras.Remove(mainCamera);
 
         // 更新
@@ -159,6 +179,12 @@ public class CameraManager : MonoBehaviour, ICameraManager
                 continue;
             }
 
+            // Cameraコンポーネントを持たないものは、メインカメラ候補にできない。
+            if (managedCam.Cam == null)
+            {
+                continue;
+            }
+
             // 最も優先順位の高いカメラを残す
             if (_currentMainCamera == null)
             {
@@ -175,28 +201,50 @@ public class CameraManager : MonoBehaviour, ICameraManager
         {
             if (_currentMainCamera == managedCam)
             {
+                if (managedCam.Cam == null)
+                {
+                    continue;
+                }
+
+                // 最優先のカメラだけを実際に描画する。
                 managedCam.Cam.enabled = true;
 
                 var cameraData = _currentMainCamera.Cam.GetUniversalAdditionalCameraData();
 
                 _uiCamera = null;
-                int uiLayer = LayerMask.NameToLayer("UI");
-                foreach (var cam in cameraData.cameraStack)
+                if (cameraData != null)
                 {
-                    if (cam.gameObject.layer == uiLayer)
+                    // URPのCameraStackからUIレイヤーのカメラを探し、Canvasの描画カメラに使う。
+                    int uiLayer = LayerMask.NameToLayer("UI");
+                    foreach (var cam in cameraData.cameraStack)
                     {
-                        _uiCamera = cam;
+                        if (cam.gameObject.layer == uiLayer)
+                        {
+                            _uiCamera = cam;
+                        }
                     }
                 }
 
-                foreach (var uiCanvas in _uiCanvasList)
+                if (_uiCanvasList != null)
                 {
-                    uiCanvas.worldCamera = _uiCamera;
+                    foreach (var uiCanvas in _uiCanvasList)
+                    {
+                        if (uiCanvas != null)
+                        {
+                            uiCanvas.worldCamera = _uiCamera;
+                        }
+                    }
                 }
 
             }
             else
             {
+                if (managedCam.Cam == null)
+                {
+                    continue;
+                }
+
+                // 優先されなかったメインカメラは無効化し、同時に複数描画されるのを防ぐ。
                 managedCam.Cam.enabled = false;
             }
         }
@@ -204,10 +252,55 @@ public class CameraManager : MonoBehaviour, ICameraManager
 
     public float SetCinemachineBrainDefaultBlendTime(float duration)
     {
+        // ActiveBrainが1つもない場合、GetActiveBrain(0)自体が失敗するため先に件数を確認する。
+        if (Unity.Cinemachine.CinemachineBrain.ActiveBrainCount == 0) return 0;
+
         Unity.Cinemachine.CinemachineBrain brain = Unity.Cinemachine.CinemachineBrain.GetActiveBrain(0);
+
+        // MainCameraがまだ生成されていないタイミングでは、Blend時間を変更できない。
+        if (brain == null) return 0;
+
         float old = brain.DefaultBlend.Time;
         brain.DefaultBlend.Time = duration;
         return old;
+    }
+
+    void Awake()
+    {
+        // CameraManagerは全体で1つだけ使う。重複した場合は先に登録済みのものを優先する。
+        // ServiceLocatorはinterfaceで返すため、Unity独自のnull判定を使えるようObjectとして比較する。
+        UnityEngine.Object currentManager = ICameraManager.Instance as UnityEngine.Object;
+        if (currentManager != null && currentManager != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        // 他のクラスは ICameraManager.Instance から、このManagerへアクセスする。
+        ServiceLocator<ICameraManager>.Register(this);
+
+        // 同じPrefabにCameraControllerが付いている場合は、自動で接続する。
+        if (TryGetComponent(out CameraController cameraController))
+        {
+            SetCamera(cameraController);
+        }
+
+        // 同じPrefabにManagedMainCameraが付いている場合は、自分自身をメインカメラ候補にする。
+        if (TryGetComponent(out ManagedMainCamera mainCamera))
+        {
+            ManageMainCamera(mainCamera);
+        }
+    }
+
+    void OnDestroy()
+    {
+        // 自分が登録したサービスだけを解除し、別のCameraManagerの登録を消さないようにする。
+        // interfaceのまま比較するとUnityのObject比較にならないため、Objectへ戻してから比較する。
+        UnityEngine.Object currentManager = ICameraManager.Instance as UnityEngine.Object;
+        if (currentManager == this)
+        {
+            ServiceLocator<ICameraManager>.Unregister();
+        }
     }
 
     void Start()
