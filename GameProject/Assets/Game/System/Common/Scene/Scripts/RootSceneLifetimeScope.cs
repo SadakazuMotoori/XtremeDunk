@@ -11,6 +11,7 @@ using MackySoft.Navigathena.SceneManagement;
 using MackySoft.Navigathena.SceneManagement.VContainer;
 using System;
 using System.Threading;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -40,6 +41,12 @@ public sealed class RootSceneLifecycle : SceneLifecycleBase
 
 public sealed class RootSceneLifetimeScope : LifetimeScope
 {
+    // RootSceneが起動時に生成するMainCamera Prefab。
+    // SerializeFieldで参照を持つことで、必須システムをビルドに含める。
+     [Header("カメラ管理システム")]
+    [SerializeField] GameObject _mainCameraPrefab;
+    GameObject _mainCameraInstance;
+
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterSceneLifecycle<RootSceneLifecycle>();
@@ -47,6 +54,8 @@ public sealed class RootSceneLifetimeScope : LifetimeScope
   
     private void Start()
     {
+        InitializeMainCamera();
+
         // 製品版ならタイトルシーンへ
         ISceneIdentifier    _newScene       = null;
         string              _nextSceneName  = "";
@@ -61,5 +70,27 @@ public sealed class RootSceneLifetimeScope : LifetimeScope
             GlobalSceneNavigator.Instance.Replace(_newScene);
         }
     }
-}
 
+    void InitializeMainCamera()
+    {
+        // すでにMainCameraを生成済みなら、二重生成を避ける。
+        if (_mainCameraInstance != null)
+        {
+            return;
+        }
+
+        // 何らかの理由でCameraManagerが先に存在している場合も、重複生成しない。
+        if (ICameraManager.Instance != null)
+        {
+            return;
+        }
+
+        if (_mainCameraPrefab == null)
+        {
+            Debug.LogError("MainCamera PrefabがRootSceneLifetimeScopeに設定されていません。");
+            return;
+        }
+
+        _mainCameraInstance = Instantiate(_mainCameraPrefab, transform);
+    }
+}

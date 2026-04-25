@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84d883c4353ee1849a77ef58f347e12c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RootSceneEntryPoint
+  _mainCameraPrefab: {fileID: 3049565315612735618, guid: 0162d479f3eb0dc458aaa1904aaefb9b, type: 3}
   parentReference:
     TypeName: 
   autoRun: 1
