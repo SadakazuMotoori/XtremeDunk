@@ -7,13 +7,46 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
+/// プレイヤー入力サービスの公開窓口。
+/// 呼び出し側は具体クラスではなく IPlayerInputManager.Instance を使うことで、
+/// CameraManager と同じServiceLocator経由で現在の入力管理インスタンスへアクセスできる。
+/// </summary>
+public interface IPlayerInputManager : IService<IPlayerInputManager>
+{
+    /// <summary>
+    /// UI操作用の入力状態を取得する。
+    /// UISelectableなど、UI上の選択・決定・キャンセル処理はここから入力を読む。
+    /// </summary>
+    PlayerInputManager.UIActions UIAction { get; }
+
+    /// <summary>
+    /// 直近の入力デバイスがキーボード/マウス系かどうかを取得する。
+    /// 表示する操作説明やカーソル表示の切り替えで利用する。
+    /// </summary>
+    bool IsNowKeyboardMouseMode { get; }
+
+    /// <summary>
+    /// 入力デバイスが切り替わった時に通知されるObservable。
+    /// UI表示や操作説明を、最後に使われたデバイスに合わせたい時に購読する。
+    /// </summary>
+    Observable<PlayerInputManager.DevideTypes> OnChangeDevice { get; }
+
+    /// <summary>
+    /// 現在有効なInputActionMapを切り替える。
+    /// 画面状態に応じて、Gameplay用・UI用などの入力受付を切り替えるために使う。
+    /// </summary>
+    void SwitchCurrentActionMap(string mapName);
+}
+
+/// <summary>
 /// プレイヤー入力管理
 /// </summary>
 [RequireComponent(typeof(PlayerInput))]
 [DefaultExecutionOrder(-1)]
-public class PlayerInputManager : MonoBehaviour
+public class PlayerInputManager : MonoBehaviour, IPlayerInputManager
 {
-    public static PlayerInputManager Instance { get; private set; }
+    // 既存コードがPlayerInputManager.Instanceを参照しているため、ServiceLocator経由の互換入口として残す。
+    public static PlayerInputManager Instance => IPlayerInputManager.Instance as PlayerInputManager;
 
     [SerializeField] PlayerInput _playerInput;
 
@@ -114,13 +147,18 @@ public class PlayerInputManager : MonoBehaviour
     // 
     private void Awake()
     {
-        // Singleton
-        if (Instance != null && Instance != this)
+        // PlayerInputManagerは全体で1つだけ使う。重複した場合は、先にServiceLocatorへ登録済みのものを優先する。
+        // ServiceLocatorはinterfaceで返すため、Unity独自のnull判定を使えるようObjectとして比較する。
+        UnityEngine.Object currentManager = IPlayerInputManager.Instance as UnityEngine.Object;
+        if (currentManager != null && currentManager != this)
         {
             Destroy(gameObject);
             return;
         }
-        Instance = this;
+
+        // 他のクラスは IPlayerInputManager.Instance から、このManagerへアクセスする。
+        // 既存の PlayerInputManager.Instance も、この登録内容を参照する。
+        ServiceLocator<IPlayerInputManager>.Register(this);
 
         // Prefab側の設定漏れがあっても、同じGameObject上のPlayerInputを自動取得する。
         if (_playerInput == null)
@@ -150,9 +188,12 @@ public class PlayerInputManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (Instance == this)
+        // 自分が登録したサービスだけを解除し、別のPlayerInputManagerの登録を消さないようにする。
+        // interfaceのまま比較するとUnityのObject比較にならないため、Objectへ戻してから比較する。
+        UnityEngine.Object currentManager = IPlayerInputManager.Instance as UnityEngine.Object;
+        if (currentManager == this)
         {
-            Instance = null;
+            ServiceLocator<IPlayerInputManager>.Unregister();
         }
 
         // コードで作成したInputActionは、破棄時に明示的に解放する。

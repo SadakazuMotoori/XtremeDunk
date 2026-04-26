@@ -46,6 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RootSceneEntryPoint
   _mainCameraPrefab: {fileID: 3049565315612735618, guid: 0162d479f3eb0dc458aaa1904aaefb9b, type: 3}
   _inputManagerPrefab: {fileID: 5012345678901234567, guid: 8fcf909f69934877855719108cfc564d, type: 3}
+  _windowManagerPrefab: {fileID: 5401000000000000001, guid: e51e29256ffe4af1b3408c956e8530e1, type: 3}
   parentReference:
     TypeName: 
   autoRun: 1

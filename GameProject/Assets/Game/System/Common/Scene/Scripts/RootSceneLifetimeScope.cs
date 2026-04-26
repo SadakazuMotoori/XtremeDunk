@@ -14,6 +14,7 @@ using System.Threading;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using WindowSystem;
 
 public sealed class RootSceneLifecycle : SceneLifecycleBase
 {
@@ -53,6 +54,12 @@ public sealed class RootSceneLifetimeScope : LifetimeScope
     [SerializeField] GameObject _inputManagerPrefab;
     GameObject _inputManagerInstance;
 
+    // RootSceneが起動時に生成するWindowManager Prefab。
+    // ウィンドウ制御は全シーン共通で必要になるため、RootSceneで常駐させる。
+    [Header("ウィンドウ管理システム")]
+    [SerializeField] GameObject _windowManagerPrefab;
+    GameObject _windowManagerInstance;
+
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterSceneLifecycle<RootSceneLifecycle>();
@@ -62,6 +69,7 @@ public sealed class RootSceneLifetimeScope : LifetimeScope
     {
         InitializeInputManager();
         InitializeMainCamera();
+        InitializeWindowManager();
 
         // 製品版ならタイトルシーンへ
         ISceneIdentifier    _newScene       = null;
@@ -122,5 +130,28 @@ public sealed class RootSceneLifetimeScope : LifetimeScope
         }
 
         _mainCameraInstance = Instantiate(_mainCameraPrefab, transform);
+    }
+
+    void InitializeWindowManager()
+    {
+        // すでにWindowManagerを生成済みなら、二重生成を避ける。
+        if (_windowManagerInstance != null)
+        {
+            return;
+        }
+
+        // 何らかの理由でWindowManagerが先に存在している場合も、重複生成しない。
+        if (IWindowManager.Instance != null)
+        {
+            return;
+        }
+
+        if (_windowManagerPrefab == null)
+        {
+            Debug.LogError("WindowManager PrefabがRootSceneLifetimeScopeに設定されていません。");
+            return;
+        }
+
+        _windowManagerInstance = Instantiate(_windowManagerPrefab, transform);
     }
 }

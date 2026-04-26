@@ -7,31 +7,42 @@ using UnityEngine;
 
 namespace WindowSystem
 {
+    public interface IWindowManager : IService<IWindowManager>
+    {
+        void SetNormalWindow(NormalWindow window);
+        UniTask<TWindow> CreateWindow<TWindow>(object assetAddress, System.Func<TWindow, UniTask> onInitialize) where TWindow : WindowBase;
+        UniTask CloseWindow(WindowBase window);
+    }
+
     /// <summary>
     /// ウィンドウ管理クラス
     /// </summary>
     [DefaultExecutionOrder(-100000)]
-    public class WindowManager : MonoBehaviour
+    public class WindowManager : MonoBehaviour, IWindowManager
     {
         #region Singleton
-        public static WindowManager Instance { get; private set; }
+        public static WindowManager Instance => IWindowManager.Instance as WindowManager;
 
         private void Awake()
         {
-            if (Instance != null && Instance != this)
+            UnityEngine.Object currentManager = IWindowManager.Instance as UnityEngine.Object;
+            if (currentManager != null && currentManager != this)
             {
                 Destroy(gameObject);
                 return;
             }
 
-            Instance = this;
+            ServiceLocator<IWindowManager>.Register(this);
             Initialize();
         }
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void sInit()
+        private void OnDestroy()
         {
-            Instance = null;
+            UnityEngine.Object currentManager = IWindowManager.Instance as UnityEngine.Object;
+            if (currentManager == this)
+            {
+                ServiceLocator<IWindowManager>.Unregister();
+            }
         }
         #endregion
 

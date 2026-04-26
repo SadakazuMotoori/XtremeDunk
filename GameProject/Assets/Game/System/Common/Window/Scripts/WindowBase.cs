@@ -37,7 +37,7 @@ namespace WindowSystem
         // ウィンドウを閉じる
         public async UniTask CloseWindow()
         {
-            await WindowManager.Instance.CloseWindow(this);
+            await IWindowManager.Instance.CloseWindow(this);
         }
 
         //=============================================

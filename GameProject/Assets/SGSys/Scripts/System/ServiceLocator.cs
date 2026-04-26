@@ -67,7 +67,7 @@ public static class ServiceLocator<T> where T : class
 public interface IService<T> where T : class
 {
     /// <summary>
-    /// インスタンスを取得する(初回の１度目のみServiceLocatorから取得)。
+    /// インスタンスを取得する(アクセスごとにServiceLocatorから現在の登録内容を取得)。
     /// </summary>
     public static T Instance => ServiceLocator<T>.Instance;
 }

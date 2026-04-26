@@ -11,7 +11,7 @@ namespace WindowSystem
 
         private void Awake()
         {
-            WindowManager.Instance.SetNormalWindow(this);
+            IWindowManager.Instance.SetNormalWindow(this);
         }
     }
 }
