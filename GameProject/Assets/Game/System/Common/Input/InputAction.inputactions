@@ -114,9 +114,31 @@
                     "isPartOfComposite": true
                 },
                 {
+                    "name": "up",
+                    "id": "a8e10e1f-1c53-4c2d-a345-1d4f8f1930bb",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Axis",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "down",
                     "id": "11469e68-bd8e-4226-bfdc-e788e5f5868e",
                     "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Axis",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "6f79ec4f-6a55-4f64-8b7c-1b7aeb93f1f8",
+                    "path": "<Keyboard>/downArrow",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
