@@ -15,8 +15,9 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 using WindowSystem;
+using Unity.VisualScripting;
 
-public sealed class RootSceneLifecycle : SceneLifecycleBase
+public sealed class PersistentSceneLifecycle : SceneLifecycleBase
 {
     protected override async UniTask OnInitialize(ISceneDataReader reader, IProgress<IProgressDataStore> progress, CancellationToken cancellationToken)
     {
@@ -40,29 +41,29 @@ public sealed class RootSceneLifecycle : SceneLifecycleBase
 }
 //==================================================================
 
-public sealed class RootSceneLifetimeScope : LifetimeScope
+public sealed class PersistentSceneLifetimeScope : LifetimeScope
 {
-    // RootSceneが起動時に生成するMainCamera Prefab。
+    // PersistentSceneが起動時に生成するMainCamera Prefab。
     // SerializeFieldで参照を持つことで、必須システムをビルドに含める。
      [Header("カメラ管理システム")]
     [SerializeField] GameObject _mainCameraPrefab;
     GameObject _mainCameraInstance;
 
-    // RootSceneが起動時に生成するInputManager Prefab。
-    // 入力は全シーン共通で必要になるため、MainCameraと同じくRootSceneで常駐させる。
+    // PersistentSceneが起動時に生成するInputManager Prefab。
+    // 入力は全シーン共通で必要になるため、MainCameraと同じくPersistentSceneで常駐させる。
     [Header("入力管理システム")]
     [SerializeField] GameObject _inputManagerPrefab;
     GameObject _inputManagerInstance;
 
-    // RootSceneが起動時に生成するWindowManager Prefab。
-    // ウィンドウ制御は全シーン共通で必要になるため、RootSceneで常駐させる。
+    // PersistentSceneが起動時に生成するWindowManager Prefab。
+    // ウィンドウ制御は全シーン共通で必要になるため、PersistentSceneで常駐させる。
     [Header("ウィンドウ管理システム")]
     [SerializeField] GameObject _windowManagerPrefab;
     GameObject _windowManagerInstance;
 
     protected override void Configure(IContainerBuilder builder)
     {
-        builder.RegisterSceneLifecycle<RootSceneLifecycle>();
+        builder.RegisterSceneLifecycle<PersistentSceneLifecycle>();
     }
   
     private void Start()
@@ -75,7 +76,7 @@ public sealed class RootSceneLifetimeScope : LifetimeScope
         ISceneIdentifier    _newScene       = null;
         string              _nextSceneName  = "";
 #if !IS_PRODUCT
-        _nextSceneName = "DebugScene";
+        _nextSceneName = "DebugTopScene";
 #else
         _nextSceneName = "TitleScene";
 #endif

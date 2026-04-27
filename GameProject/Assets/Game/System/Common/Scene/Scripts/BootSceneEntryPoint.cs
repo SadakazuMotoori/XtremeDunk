@@ -14,7 +14,7 @@ using VContainer.Unity;
 
 public sealed class BootSceneEntryPoint : ScopedSceneEntryPoint
 {
-    const string kRootSceneName = "RootScene";
+    const string kRootSceneName = "PersistentScene";
 
     protected override async UniTask<LifetimeScope> EnsureParentScope(CancellationToken cancellationToken)
     {

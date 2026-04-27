@@ -129,7 +129,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 856372945103511292, guid: 0eb36b955f1998047adfd0e28711642c, type: 3}
       propertyPath: m_Name
-      value: RootSceneLifetimeScope
+      value: PersistentSceneLifetimeScope
       objectReference: {fileID: 0}
     - target: {fileID: 6592859202638186908, guid: 0eb36b955f1998047adfd0e28711642c, type: 3}
       propertyPath: m_LocalPosition.x
