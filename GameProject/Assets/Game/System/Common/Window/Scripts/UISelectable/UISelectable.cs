@@ -14,6 +14,7 @@ using UnityEngine.EventSystems;
 
 
 // UISelectCursorTargetが選択された時に通知(子から親)
+// フォーカスが移動した時、親UIへカーソル対象のRectTransformを通知するためのInterface。
 public interface INotifySelectedCursorTarget
 {
     void OnFocusedCursotTarget(RectTransform target);
@@ -28,6 +29,7 @@ public interface INotifySelectedCursorTarget
 //==================================================================
 public class UISelectable : Selectable, IPointerClickHandler/*, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler*/, IPointerMoveHandler
 {
+    // UnityのSelectableを拡張し、ゲームパッド/キーボード/マウス共通の選択対象として扱う。
     [Header("=======================\nここからUISelectable\n=======================")]
 
     [SerializeField] int _priority;
@@ -77,6 +79,7 @@ public class UISelectable : Selectable, IPointerClickHandler/*, IPointerEnterHan
 
     // 所属先グループを取得
     UISelectableGroup _nowOwnerGroup = null;
+    // 実行中は所属中のGroup、Editor上では親階層やGlobalGroupから所属先を推定する。
     public UISelectableGroup GetOwnerGroup()
     {
         if (Application.isPlaying)
@@ -129,6 +132,7 @@ public class UISelectable : Selectable, IPointerClickHandler/*, IPointerEnterHan
     public bool IsFocused { get; private set; }
 
     // フォーカスフラグの操作
+    // 選択状態の見た目とUnity UI上のSelect状態をまとめて切り替える。
     public void SetFocusedFlag(bool enable)
     {
         if (IsFocused == enable) return;
@@ -185,6 +189,7 @@ public class UISelectable : Selectable, IPointerClickHandler/*, IPointerEnterHan
     //  _fashionSwitch.SubscribeNotifyEvent(async action =>
     //  {
     //  });
+    // 決定やメニューなどの操作通知を、非同期処理として購読できるようにする。
     public System.IDisposable SubscribeNotifyEvent(System.Func<Actions, UniTask> selectable)
     {
         return _onNotifyEvent.Subscribe(async s =>
@@ -228,6 +233,7 @@ public class UISelectable : Selectable, IPointerClickHandler/*, IPointerEnterHan
 
     // Selectableクラスからのコピー
     // ・UISelectable以外には繋がない
+    // 同じUISelectableGroupに属する候補だけを対象に、指定方向の移動先を探す。
     public new Selectable FindSelectable(Vector3 dir)
     {
         if (_onlyMouse) return null;
@@ -505,6 +511,7 @@ public class UISelectable : Selectable, IPointerClickHandler/*, IPointerEnterHan
     */
 
     // 決定時の特別な実行処理
+    // 決定入力時の通知、UnityEvent、必要なら外部の非同期処理まで順番に実行する。
     public async UniTask ExecDecideProc(bool isGamepad)
     {
         if (!IsActive() || !IsInteractable()) return;
@@ -656,6 +663,7 @@ public class UISelectable : Selectable, IPointerClickHandler/*, IPointerEnterHan
 
     protected override void OnEnable()
     {
+        // 有効化されたら親Groupへ参加し、カーソル移動や決定処理の対象に入る。
         base.OnEnable();
 
         if (Application.isPlaying)
@@ -671,6 +679,7 @@ public class UISelectable : Selectable, IPointerClickHandler/*, IPointerEnterHan
     }
     protected override void OnDisable()
     {
+        // 無効化されたら所属Groupから外し、選択候補に残らないようにする。
         base.OnDisable();
 
 
@@ -827,6 +836,7 @@ public class UISelectable : Selectable, IPointerClickHandler/*, IPointerEnterHan
 
     List<RaycastResult> _raycastResults = new();
 
+    // マウス移動で項目に触れた時、必要に応じてこの項目へフォーカスを移す。
     void IPointerMoveHandler.OnPointerMove(PointerEventData eventData)
     {
         if (Cursor.visible == false) return;
@@ -875,6 +885,7 @@ public class UISelectable : Selectable, IPointerClickHandler/*, IPointerEnterHan
     }
 
     // 決定(押す)
+    // 押した瞬間に決定扱いする設定の場合、ここで操作結果を一時保存する。
     public override void OnPointerDown(PointerEventData eventData)
     {
         if (Cursor.visible == false) return;
@@ -916,6 +927,7 @@ public class UISelectable : Selectable, IPointerClickHandler/*, IPointerEnterHan
     }
 
     // 決定(クリック)
+    // クリック完了時に決定扱いする設定の場合、ここで操作結果を一時保存する。
     public virtual void OnPointerClick(PointerEventData eventData)
     {
         if (Cursor.visible == false) return;
@@ -955,6 +967,7 @@ public class UISelectable : Selectable, IPointerClickHandler/*, IPointerEnterHan
     // 決定Unityイベント用(あまり使わないように)
     public class EventArg
     {
+        // UnityEventへ渡す決定イベント情報。非同期処理中かどうかも呼び出し側へ伝える。
         public UISelectable Target { get; set; }
 
         /// <summary>

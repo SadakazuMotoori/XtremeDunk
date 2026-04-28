@@ -6,18 +6,21 @@ using UnityEngine;
 
 namespace WindowSystem
 {
+    // フェード用Imageに設定する色。現状は黒と白のみを許可している。
     public enum FadeColors
     {
         Black,
         White,
     }
 
+    // FadeInは幕を消す、FadeOutは幕を表示する指定として扱う。
     public enum FadeTypes
     {
         FadeIn,
         FadeOut,
     }
 
+    // フェード幕をどのUIレイヤーの高さに置くかを指定する。
     public enum FadePriorities
     {
         FullScreen,
@@ -27,6 +30,7 @@ namespace WindowSystem
 
     public interface IWindowManager : IService<IWindowManager>
     {
+        // Window関連システムの公開窓口。利用側はWindowManager本体ではなくこのInterfaceへアクセスする。
         void SetNormalWindow(NormalWindow window);
         UniTask RequestFade(FadeColors fadeColor, FadeTypes fadeType, int durationMilliseconds, FadePriorities priority);
         UniTask<TWindow> CreateWindow<TWindow>(object assetAddress, System.Func<TWindow, UniTask> onInitialize) where TWindow : WindowBase;
@@ -39,6 +43,7 @@ namespace WindowSystem
     [DefaultExecutionOrder(-100000)]
     public class WindowManager : MonoBehaviour, IWindowManager
     {
+        // PopupWindowの生成・破棄、入力Map切り替え、画面フェードをまとめて管理する。
         #region Singleton
         private static WindowManager Instance => IWindowManager.Instance as WindowManager;
 
@@ -69,6 +74,7 @@ namespace WindowSystem
         [SerializeField] Transform _popupWindowGroup;
 
         // 暗幕への参照
+        // フェード幕として使うImage。Prefab側では1x1でも、初期化時に画面サイズへ広げる。
         [SerializeField] UnityEngine.UI.Image _imgFadeCurtrain;
         Tween _tweenFadeCurtain;
         Canvas _canvasFadeCurtain;
@@ -90,6 +96,7 @@ namespace WindowSystem
 
         void Start()
         {
+            // 開いているPopupの有無に応じて、利用するInputActionMapを切り替える。
             // 
             void ChangeInputMode()
             {
@@ -150,11 +157,13 @@ namespace WindowSystem
         // 
         public void SetNormalWindow(NormalWindow window)
         {
+            // Popupが無い時の入力Map参照先として、現在の通常Windowを保持する。
             _currentNormalWindow = window;
         }
 
         public async UniTask RequestFade(FadeColors fadeColor, FadeTypes fadeType, int durationMilliseconds, FadePriorities priority)
         {
+            // リクエストごとに開始Alphaを決め直し、FadeIn/FadeOutの途中状態に依存しないようにする。
             InitializeFadeCurtain();
             if (_imgFadeCurtrain == null) return;
 
@@ -195,6 +204,7 @@ namespace WindowSystem
 
         void InitializeFadeCurtain()
         {
+            // 初回だけCanvasやサイズを取得し、未使用時はRaycastも表示も無効にしておく。
             if (_isFadeCurtainInitialized) return;
             if (_imgFadeCurtrain == null) return;
 
@@ -209,6 +219,7 @@ namespace WindowSystem
 
         void UpdateFadeCurtainSize()
         {
+            // 解像度が変わった時だけ、1x1のPrefab Imageを現在の画面サイズへ合わせ直す。
             if (_imgFadeCurtrain == null) return;
             if (_fadeCurtainScreenWidth == Screen.width && _fadeCurtainScreenHeight == Screen.height) return;
 
@@ -229,6 +240,7 @@ namespace WindowSystem
 
         void SetFadePriority(FadePriorities priority)
         {
+            // CanvasのsortingOrderで、フェード幕をLoadingUI/HUDより上または下へ配置する。
             if (_canvasFadeCurtain == null) return;
 
             switch (priority)
@@ -247,6 +259,7 @@ namespace WindowSystem
 
         void ApplyFadeEndState(float alpha)
         {
+            // 完全に透明になった幕は非表示にし、入力を拾わない状態へ戻す。
             bool isVisible = alpha > 0;
             _imgFadeCurtrain.raycastTarget = isVisible;
             _imgFadeCurtrain.gameObject.SetActive(isVisible);

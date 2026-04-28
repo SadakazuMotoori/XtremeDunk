@@ -12,6 +12,7 @@ namespace WindowSystem
     /// </summary>
     public abstract class PopupWindow : WindowBase
     {
+        // WindowManagerから生成される、前面に重ねるタイプのWindow基底クラス。
         // UIのTopのTransform
         [SerializeField] RectTransform _topUITransform;
         public RectTransform TopUITransform => _topUITransform;
@@ -30,6 +31,7 @@ namespace WindowSystem
         // 
         public async UniTask CloseTopOwnerWindow()
         {
+            // 自分を開く前に積まれていた親Popupを、上から順番に閉じる。
             var wnd = PrevWindow;
             while(wnd != null)
             {
@@ -65,6 +67,7 @@ namespace WindowSystem
         // 戻り値：false…ウィンドウ閉じる
         public virtual async UniTask<bool> OnDecide(UISelectable selectable)
         {
+            // falseを返すとRun側でこのWindowを閉じ、選択結果を呼び出し元へ返す。
             await UniTask.DelayFrame(1);
             return true;
         }
@@ -75,6 +78,7 @@ namespace WindowSystem
         /// <returns>押したボタンのID</returns>
         public async UniTask<(int IDInt, string IDString)> Run()
         {
+            // SelectableGroupを使い、カーソル移動・決定・Window終了までを1つのループで扱う。
             var cancelToken = this.GetCancellationTokenOnDestroy();
 
             // 

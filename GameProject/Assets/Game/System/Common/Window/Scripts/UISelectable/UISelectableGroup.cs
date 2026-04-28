@@ -19,6 +19,7 @@ using UnityEngine.UI;
 //==================================================================
 public class UISelectableGroup : MonoBehaviour
 {
+    // 複数のUISelectableを束ね、現在選択中の項目とカーソル表示を管理する。
     public static UISelectableGroup s_GlobalGroup { get; set; } = null;
 
     [Header("初期選択")]
@@ -39,6 +40,7 @@ public class UISelectableGroup : MonoBehaviour
 
     // 
     List<UISelectable> _members = new();
+    // 現在このGroupに参加している選択候補。Priority順に並べて利用する。
     public IReadOnlyList<UISelectable> Members => _members;
 
     UISelectable GetTopSelectable()
@@ -63,6 +65,7 @@ public class UISelectableGroup : MonoBehaviour
     // 現在選択中のもの
     public UISelectable CurrentSelected
     {
+        // ここを変更すると、旧選択の解除、新選択の表示、カーソル追従までまとめて行われる。
         get => _currentSelected;
         set
         {
@@ -120,6 +123,7 @@ public class UISelectableGroup : MonoBehaviour
 
     void Start()
     {
+        // 起動後は選択変更イベントとカーソル追従を毎フレーム監視する。
         // 1フレームの一回イベントを発生させたいため、ここでやる
         Observable.EveryValueChanged(this, x => CurrentSelected)
             .Where(_ => enabled)
@@ -214,11 +218,13 @@ public class UISelectableGroup : MonoBehaviour
     // 子からの通知
     public void Join(UISelectable selectable)
     {
+        // OnEnable直後は一覧更新中の可能性があるため、一旦予約リストへ積む。
         _reservedAdd.Add(selectable);
     }
 
     public void UpdateReservedItems()
     {
+        // 予約されたSelectableを本リストへ反映し、未選択なら先頭候補を選ぶ。
         if (_reservedAdd.Count >= 1)
         {
             // 本リストに追加
@@ -244,6 +250,7 @@ public class UISelectableGroup : MonoBehaviour
 
     public void Leave(UISelectable selectable)
     {
+        // 無効化・破棄されたSelectableを候補から外し、選択中なら解除する。
         if(CurrentSelected == selectable)
         {
             CurrentSelected = null;
@@ -271,6 +278,7 @@ public class UISelectableGroup : MonoBehaviour
     //==================================================================
     public async UniTask<(UISelectable.Actions action, UISelectable select)> UpdateCursor()
     {
+        // 入力状態を読み取り、選択移動・決定・メニュー操作を1フレーム分処理する。
         if(_startTime < 0)
         {
             _startTime = Time.unscaledTime;
@@ -454,6 +462,7 @@ public class UISelectableGroup : MonoBehaviour
     [System.Serializable]
     public class CursorObjectData
     {
+        // 選択中のUISelectableへ追従する、枠やカーソル用オブジェクトの設定。
         public UISelectableGroup Owner { get; set; }
 
         [SerializeField] RectTransform _cursorTrans;
@@ -566,6 +575,7 @@ public class UISelectableGroup : MonoBehaviour
 
     public async UniTask<UISelectable> SimpleExecAsync()
     {
+        // 決定されたSelectableだけを待ちたい単純な画面向けの補助処理。
         var cancelToken = this.GetCancellationTokenOnDestroy();
 
         while (true)

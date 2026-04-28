@@ -10,8 +10,10 @@ using MackySoft.Navigathena;
 using MackySoft.Navigathena.SceneManagement;
 
 // デバッグシーンのSceneEntryPointを実装するコンポーネント
+// テンプレート用のSceneEntryPoint。実際のシーンでは必要な処理だけを各ライフサイクルへ追加する。
 public sealed class TemplateSceneEntoryPoint : SceneEntryPointBase
 {
+    // Navigathenaがシーン遷移中に呼び出す標準ライフサイクル。現状は雛形なので1フレーム待機のみ。
     protected override async UniTask OnInitialize(ISceneDataReader reader, IProgress<IProgressDataStore> progress, CancellationToken cancellationToken)
     {
         await UniTask.DelayFrame(1);

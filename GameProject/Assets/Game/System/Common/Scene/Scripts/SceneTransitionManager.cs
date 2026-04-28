@@ -5,6 +5,7 @@ using WindowSystem;
 
 public interface ISceneTransitionManager : IService<ISceneTransitionManager>
 {
+    // フェード付きシーン遷移の公開窓口。利用側はこのInterface経由で遷移を依頼する。
     bool IsProcessingSceneChange { get; }
     UniTask RequestSceneChange(string sceneName, int fadeOutDurationMilliseconds = 500, int fadeInDurationMilliseconds = 500, FadeColors fadeColor = FadeColors.Black, FadePriorities priority = FadePriorities.FullScreen);
     UniTask RequestSceneChange(ISceneIdentifier sceneIdentifier, int fadeOutDurationMilliseconds = 500, int fadeInDurationMilliseconds = 500, FadeColors fadeColor = FadeColors.Black, FadePriorities priority = FadePriorities.FullScreen);
@@ -13,6 +14,7 @@ public interface ISceneTransitionManager : IService<ISceneTransitionManager>
 [DefaultExecutionOrder(-100000)]
 public class SceneTransitionManager : MonoBehaviour, ISceneTransitionManager
 {
+    // シーン遷移中の二重リクエストを防ぐための状態フラグ。
     public bool IsProcessingSceneChange { get; private set; }
 
     void Awake()
@@ -38,6 +40,7 @@ public class SceneTransitionManager : MonoBehaviour, ISceneTransitionManager
 
     public async UniTask RequestSceneChange(string sceneName, int fadeOutDurationMilliseconds = 500, int fadeInDurationMilliseconds = 500, FadeColors fadeColor = FadeColors.Black, FadePriorities priority = FadePriorities.FullScreen)
     {
+        // 文字列指定をNavigathena用のSceneIdentifierへ変換して共通処理へ流す。
         if (string.IsNullOrEmpty(sceneName)) return;
 
         await RequestSceneChange(new BuiltInSceneIdentifier(sceneName), fadeOutDurationMilliseconds, fadeInDurationMilliseconds, fadeColor, priority);
@@ -52,6 +55,7 @@ public class SceneTransitionManager : MonoBehaviour, ISceneTransitionManager
 
         try
         {
+            // FadeOutからFadeInが終わるまで入力を止め、遷移中の誤操作を防ぐ。
             if (IPlayerInputManager.Instance != null)
             {
                 IPlayerInputManager.Instance.SetInputBlocked(true);
@@ -65,6 +69,7 @@ public class SceneTransitionManager : MonoBehaviour, ISceneTransitionManager
             await GlobalSceneNavigator.Instance.Replace(sceneIdentifier);
             await UniTask.DelayFrame(1);
 
+            // シーン差し替え後、1フレーム待って新しいUIが出揃ってからFadeInを始める。
             if (IWindowManager.Instance != null)
             {
                 await IWindowManager.Instance.RequestFade(fadeColor, FadeTypes.FadeIn, fadeInDurationMilliseconds, priority);

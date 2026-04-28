@@ -13,6 +13,7 @@ using UnityEngine.Rendering.Universal;
 // 再設計対象
 public interface ICameraManager : IService<ICameraManager>
 {
+    // カメラ関連システムの公開窓口。利用側はCameraManager本体ではなくこのInterfaceへアクセスする。
     //======================================
     // プレイヤーカメラ関係
     //======================================
@@ -40,6 +41,7 @@ public interface ICameraManager : IService<ICameraManager>
 [DefaultExecutionOrder(-10000)]
 public class CameraManager : MonoBehaviour, ICameraManager
 {
+    // PersistentSceneで常駐し、現在有効なCameraControllerやMainCameraを一元管理する。
     //======================================
     // プレイヤーカメラ関係
     //======================================

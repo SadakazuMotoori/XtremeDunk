@@ -14,10 +14,12 @@ using VContainer.Unity;
 
 public sealed class BootSceneEntryPoint : ScopedSceneEntryPoint
 {
+    // 起動時に必ず親として扱う常駐シーン名。
     const string kPersistentSceneName = "PersistentScene";
 
     protected override async UniTask<LifetimeScope> EnsureParentScope(CancellationToken cancellationToken)
     {
+        // PersistentSceneが未ロードなら追加ロードし、以降のシーンの親Scopeとして使う。
         // Load persistent scene.
         if (!SceneManager.GetSceneByName(kPersistentSceneName).isLoaded)
         {

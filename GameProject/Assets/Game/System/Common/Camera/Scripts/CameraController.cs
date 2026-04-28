@@ -12,6 +12,7 @@ namespace SGGames.Game.Sys
 {
     public partial class CameraController : MonoBehaviour
     {
+        // このControllerが扱うVirtualCamera一覧。Inspector上の登録内容をCameraDataとして参照する。
         [SerializeField]
         private CameraData[] m_CameraTable;
 
@@ -95,6 +96,7 @@ namespace SGGames.Game.Sys
         [System.Serializable]
         public class CameraData
         {
+            // 1つのVirtualCameraに対する設定と、Managerから操作するための窓口をまとめる。
             [SerializeField]
             eCameraID m_CameraID;
             public eCameraID CameraID => m_CameraID;

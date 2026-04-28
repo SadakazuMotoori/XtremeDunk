@@ -13,6 +13,7 @@ namespace WindowSystem
     /// </summary>
     public abstract class WindowBase : MonoBehaviour
     {
+        // すべてのPopupWindowが共通して持つ、生成・表示・破棄のライフサイクル基底。
 
         //=============================================
         //
@@ -32,9 +33,11 @@ namespace WindowSystem
         public WindowStates NowState { get; set; } = WindowStates.None;
 
         // 表示状態まで待つ
+        // 表示演出が完了し、WindowManagerから安全に閉じられる状態になるまで待つ。
         public async UniTask WaitForShown() => await UniTask.WaitUntil(() => NowState == WindowStates.Shown);
 
         // ウィンドウを閉じる
+        // Windowの破棄処理は、状態管理を持つWindowManagerへ依頼する。
         public async UniTask CloseWindow()
         {
             await IWindowManager.Instance.CloseWindow(this);

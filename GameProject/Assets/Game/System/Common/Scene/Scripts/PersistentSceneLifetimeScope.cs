@@ -18,6 +18,7 @@ using WindowSystem;
 
 public sealed class PersistentSceneLifecycle : SceneLifecycleBase
 {
+    // PersistentScene自体のライフサイクル。常駐シーンなので現状は待機処理のみを行う。
     protected override async UniTask OnInitialize(ISceneDataReader reader, IProgress<IProgressDataStore> progress, CancellationToken cancellationToken)
     {
         await UniTask.DelayFrame(1);
@@ -42,6 +43,7 @@ public sealed class PersistentSceneLifecycle : SceneLifecycleBase
 
 public sealed class PersistentSceneLifetimeScope : LifetimeScope
 {
+    // ゲーム全体で共有するManager Prefabを生成し、各ManagerのServiceLocator登録へつなぐ。
     // PersistentSceneが起動時に生成するMainCamera Prefab。
     // SerializeFieldで参照を持つことで、必須システムをビルドに含める。
      [Header("カメラ管理システム")]
@@ -71,6 +73,7 @@ public sealed class PersistentSceneLifetimeScope : LifetimeScope
   
     private void Start()
     {
+        // 常駐Managerは、シーン遷移を始める前に必要な順序で初期化する。
         InitializeInputManager();
         InitializeMainCamera();
         InitializeWindowManager();
@@ -160,6 +163,7 @@ public sealed class PersistentSceneLifetimeScope : LifetimeScope
 
     void InitializeSceneTransitionManager()
     {
+        // SceneTransitionManagerも他Managerと同様、既存登録があれば重複生成しない。
         if (_sceneTransitionManagerInstance != null)
         {
             return;

@@ -11,6 +11,7 @@ using UniRx;
 [RequireComponent(typeof(Camera))]
 public class ManagedMainCamera : MonoBehaviour
 {
+    // 複数のMainCamera候補がある場合、この値が高いカメラが優先して有効化される。
     [Header("優先順位")]
     [SerializeField] int _priority = 0;
     public int Priority => _priority;

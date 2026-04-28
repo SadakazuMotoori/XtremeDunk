@@ -6,6 +6,7 @@ using WindowSystem;
 
 public class DebugController : MonoBehaviour
 {
+    // デバッグシーン上に表示する簡易メニュー項目。
     [SerializeField] TextMeshProUGUI _item1Text;
     [SerializeField] TextMeshProUGUI _item2Text;
 
@@ -24,6 +25,7 @@ public class DebugController : MonoBehaviour
 
     async void Run()
     {
+        // Updateで選択状態を切り替えやすいよう、表示対象を配列としてまとめる。
         _itemTexts = new[] { _item1Text, _item2Text };
         RefreshSelection();
         await UniTask.CompletedTask;
@@ -31,6 +33,7 @@ public class DebugController : MonoBehaviour
 
     private void Update()
     {
+        // 常駐システムは具象クラスではなく、ServiceLocator経由のInterfaceから取得する。
         IPlayerInputManager inputManager = IPlayerInputManager.Instance;
         if (_itemTexts == null || inputManager == null)
         {
@@ -52,6 +55,7 @@ public class DebugController : MonoBehaviour
 
     void RefreshSelection()
     {
+        // 選択中の項目だけ色を変え、現在位置が視覚的に分かるようにする。
         for (int i = 0; i < _itemTexts.Length; i++)
         {
             if (_itemTexts[i] == null)

@@ -20,6 +20,7 @@ public class UIEventTrigger : EventTrigger, IPointerMoveHandler
 {
     public virtual void OnPointerMove(PointerEventData eventData)
     {
+        // PointerMoveを受けるための受け皿。必要になった時だけここに処理を追加する。
 //        DebugLogger.Log($"OnPointerMove {name}", DebugLogger.Colors.orange);
     }
 }

@@ -13,6 +13,7 @@ using UnityEngine.InputSystem;
 /// </summary>
 public interface IPlayerInputManager : IService<IPlayerInputManager>
 {
+    // 入力管理システムの公開窓口。利用側はPlayerInputManager本体ではなくこのInterfaceへアクセスする。
     /// <summary>
     /// UI操作用の入力状態を取得する。
     /// UISelectableなど、UI上の選択・決定・キャンセル処理はここから入力を読む。
@@ -31,6 +32,7 @@ public interface IPlayerInputManager : IService<IPlayerInputManager>
     /// </summary>
     Observable<PlayerInputManager.DevideTypes> OnChangeDevice { get; }
 
+    // trueの間はUI入力と入力デバイス検知を止め、フェード中などの誤操作を防ぐ。
     bool IsInputBlocked { get; }
     void SetInputBlocked(bool isBlocked);
 
@@ -48,6 +50,7 @@ public interface IPlayerInputManager : IService<IPlayerInputManager>
 [DefaultExecutionOrder(-1)]
 public class PlayerInputManager : MonoBehaviour, IPlayerInputManager
 {
+    // UnityのPlayerInputを包み、UIやGameplayから必要な入力状態を読みやすい形で提供する。
     // 既存コードがPlayerInputManager.Instanceを参照しているため、ServiceLocator経由の互換入口として残す。
     private static PlayerInputManager Instance => IPlayerInputManager.Instance as PlayerInputManager;
 
@@ -71,6 +74,7 @@ public class PlayerInputManager : MonoBehaviour, IPlayerInputManager
     //======================================
     public class UIActions
     {
+        // UI ActionMapの入力を、呼び出し側がboolで確認できる形に変換する。
         InputAction _axis { get; set; }
         InputAction _decide { get; set; }
         InputAction _cancel { get; set; }
@@ -78,6 +82,7 @@ public class PlayerInputManager : MonoBehaviour, IPlayerInputManager
         InputAction _option2 { get; set; }
         bool _isInputBlocked;
 
+        // 入力ブロック中は、すべてのUI入力を「押されていない」ものとして扱う。
         public bool AxisLeft => _isInputBlocked == false && _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().x < 0 : false;
         public bool AxisRight => _isInputBlocked == false && _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().x > 0 : false;
 
@@ -92,6 +97,7 @@ public class PlayerInputManager : MonoBehaviour, IPlayerInputManager
 
         public void SetInputBlocked(bool isBlocked)
         {
+            // Fade中など、画面操作を受け付けたくない期間だけtrueにする。
             _isInputBlocked = isBlocked;
         }
 
@@ -118,6 +124,7 @@ public class PlayerInputManager : MonoBehaviour, IPlayerInputManager
     public bool IsInputBlocked => _isInputBlocked;
     public void SetInputBlocked(bool isBlocked)
     {
+        // Manager本体とUIActionsの両方へ同じブロック状態を反映する。
         _isInputBlocked = isBlocked;
         _uiAction.SetInputBlocked(isBlocked);
     }
@@ -225,6 +232,7 @@ public class PlayerInputManager : MonoBehaviour, IPlayerInputManager
     {
         if (_isInputBlocked)
         {
+            // ブロック中はデバイス切り替え検知も含めて入力処理を停止する。
             return;
         }
 
