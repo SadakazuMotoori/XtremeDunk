@@ -88,7 +88,7 @@ public sealed class PersistentSceneLifetimeScope : LifetimeScope
 #endif
         if (!SceneManager.GetSceneByName(_nextSceneName).isLoaded)
         {
-            ISceneTransitionManager.Instance.RequestSceneChange(_nextSceneName,500,10000).Forget();
+            ISceneTransitionManager.Instance.RequestSceneChange(_nextSceneName).Forget();
         }
     }
 
