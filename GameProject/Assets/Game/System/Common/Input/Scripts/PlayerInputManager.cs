@@ -31,6 +31,9 @@ public interface IPlayerInputManager : IService<IPlayerInputManager>
     /// </summary>
     Observable<PlayerInputManager.DevideTypes> OnChangeDevice { get; }
 
+    bool IsInputBlocked { get; }
+    void SetInputBlocked(bool isBlocked);
+
     /// <summary>
     /// 現在有効なInputActionMapを切り替える。
     /// 画面状態に応じて、Gameplay用・UI用などの入力受付を切り替えるために使う。
@@ -73,18 +76,24 @@ public class PlayerInputManager : MonoBehaviour, IPlayerInputManager
         InputAction _cancel { get; set; }
         InputAction _option1 { get; set; }
         InputAction _option2 { get; set; }
+        bool _isInputBlocked;
 
-        public bool AxisLeft => _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().x < 0 : false;
-        public bool AxisRight => _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().x > 0 : false;
+        public bool AxisLeft => _isInputBlocked == false && _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().x < 0 : false;
+        public bool AxisRight => _isInputBlocked == false && _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().x > 0 : false;
 
-        public bool AxisUp => _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().y > 0 : false;
-        public bool AxisDown => _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().y < 0 : false;
-        public bool IsPressAxis => _axis != null && _axis.ReadValue<Vector2>().sqrMagnitude > 0;
+        public bool AxisUp => _isInputBlocked == false && _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().y > 0 : false;
+        public bool AxisDown => _isInputBlocked == false && _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().y < 0 : false;
+        public bool IsPressAxis => _isInputBlocked == false && _axis != null && _axis.ReadValue<Vector2>().sqrMagnitude > 0;
 
-        public bool Decide => _decide != null && _decide.triggered;
-        public bool Cancel => _cancel != null && _cancel.triggered;
-        public bool Option1 => _option1 != null && _option1.triggered;
-        public bool Option2 => _option2 != null && _option2.triggered;
+        public bool Decide => _isInputBlocked == false && _decide != null && _decide.triggered;
+        public bool Cancel => _isInputBlocked == false && _cancel != null && _cancel.triggered;
+        public bool Option1 => _isInputBlocked == false && _option1 != null && _option1.triggered;
+        public bool Option2 => _isInputBlocked == false && _option2 != null && _option2.triggered;
+
+        public void SetInputBlocked(bool isBlocked)
+        {
+            _isInputBlocked = isBlocked;
+        }
 
         public void Initialize(InputActionMap actMap)
         {
@@ -104,6 +113,14 @@ public class PlayerInputManager : MonoBehaviour, IPlayerInputManager
     }
     UIActions _uiAction = new();
     public UIActions UIAction => _uiAction;
+
+    bool _isInputBlocked;
+    public bool IsInputBlocked => _isInputBlocked;
+    public void SetInputBlocked(bool isBlocked)
+    {
+        _isInputBlocked = isBlocked;
+        _uiAction.SetInputBlocked(isBlocked);
+    }
 
 
     //======================================
@@ -206,6 +223,11 @@ public class PlayerInputManager : MonoBehaviour, IPlayerInputManager
 
     void Update()
     {
+        if (_isInputBlocked)
+        {
+            return;
+        }
+
         // 入力デバイスの判定
         if (_deletectionKeyboard.triggered || (Mouse.current != null && Mouse.current.delta.magnitude > 0))
         {

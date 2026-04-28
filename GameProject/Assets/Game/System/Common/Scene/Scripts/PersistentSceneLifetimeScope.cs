@@ -60,6 +60,10 @@ public sealed class PersistentSceneLifetimeScope : LifetimeScope
     [SerializeField] GameObject _windowManagerPrefab;
     GameObject _windowManagerInstance;
 
+    [Header("シーン推移管理システム")]
+    [SerializeField] GameObject _sceneTransitionManagerPrefab;
+    GameObject _sceneTransitionManagerInstance;
+
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterSceneLifecycle<PersistentSceneLifecycle>();
@@ -70,9 +74,9 @@ public sealed class PersistentSceneLifetimeScope : LifetimeScope
         InitializeInputManager();
         InitializeMainCamera();
         InitializeWindowManager();
+        InitializeSceneTransitionManager();
 
         // 製品版ならタイトルシーンへ
-        ISceneIdentifier    _newScene       = null;
         string              _nextSceneName  = "";
 #if !IS_PRODUCT
         _nextSceneName = "DebugTopScene";
@@ -81,8 +85,7 @@ public sealed class PersistentSceneLifetimeScope : LifetimeScope
 #endif
         if (!SceneManager.GetSceneByName(_nextSceneName).isLoaded)
         {
-            _newScene = new BuiltInSceneIdentifier(_nextSceneName);
-            GlobalSceneNavigator.Instance.Replace(_newScene);
+            ISceneTransitionManager.Instance.RequestSceneChange(_nextSceneName,500,10000).Forget();
         }
     }
 
@@ -153,5 +156,26 @@ public sealed class PersistentSceneLifetimeScope : LifetimeScope
         }
 
         _windowManagerInstance = Instantiate(_windowManagerPrefab, transform);
+    }
+
+    void InitializeSceneTransitionManager()
+    {
+        if (_sceneTransitionManagerInstance != null)
+        {
+            return;
+        }
+
+        if (ISceneTransitionManager.Instance != null)
+        {
+            return;
+        }
+
+        if (_sceneTransitionManagerPrefab == null)
+        {
+            Debug.LogError("SceneTransitionManager PrefabがRootSceneLifetimeScopeに設定されていません。");
+            return;
+        }
+
+        _sceneTransitionManagerInstance = Instantiate(_sceneTransitionManagerPrefab, transform);
     }
 }

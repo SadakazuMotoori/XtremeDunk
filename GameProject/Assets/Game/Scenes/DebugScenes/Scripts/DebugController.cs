@@ -19,8 +19,6 @@ public class DebugController : MonoBehaviour
 
     void Start()
     {
-        IWindowManager.Instance.RequestFade(FadeColors.Black, FadeTypes.FadeIn, 500, FadePriorities.FullScreen);
-
         Run();
     }
 
