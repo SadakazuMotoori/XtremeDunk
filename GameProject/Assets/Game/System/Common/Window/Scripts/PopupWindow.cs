@@ -58,13 +58,14 @@ namespace WindowSystem
         // 更新処理時に実行される
         public virtual async UniTask OnUpdate()
         {
-
+            await UniTask.DelayFrame(1);
         }
 
         // 決定時に実行される
         // 戻り値：false…ウィンドウ閉じる
         public virtual async UniTask<bool> OnDecide(UISelectable selectable)
         {
+            await UniTask.DelayFrame(1);
             return true;
         }
 

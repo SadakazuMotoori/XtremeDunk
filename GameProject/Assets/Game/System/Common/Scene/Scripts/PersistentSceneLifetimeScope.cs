@@ -15,7 +15,6 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 using WindowSystem;
-using Unity.VisualScripting;
 
 public sealed class PersistentSceneLifecycle : SceneLifecycleBase
 {
