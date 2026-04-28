@@ -292,7 +292,7 @@ public class UISelectableGroup : MonoBehaviour
             return (UISelectable.Actions.None, null);
         }
 
-        var inputUI = PlayerInputManager.Instance.UIAction;
+        var inputUI = IPlayerInputManager.Instance.UIAction;
 
         try
         {

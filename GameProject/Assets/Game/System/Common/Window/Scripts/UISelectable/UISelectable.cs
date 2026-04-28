@@ -591,7 +591,7 @@ public class UISelectable : Selectable, IPointerClickHandler/*, IPointerEnterHan
             // マウス専用時は、Gamepad操作で非表示にする
             if (_onlyMouse)
             {
-                PlayerInputManager.Instance.OnChangeDevice.Subscribe(type =>
+                IPlayerInputManager.Instance.OnChangeDevice.Subscribe(type =>
                 {
                     if (type == PlayerInputManager.DevideTypes.Keyboard)
                     {

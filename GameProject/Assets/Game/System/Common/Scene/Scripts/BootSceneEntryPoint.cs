@@ -14,29 +14,29 @@ using VContainer.Unity;
 
 public sealed class BootSceneEntryPoint : ScopedSceneEntryPoint
 {
-    const string kRootSceneName = "PersistentScene";
+    const string kPersistentSceneName = "PersistentScene";
 
     protected override async UniTask<LifetimeScope> EnsureParentScope(CancellationToken cancellationToken)
     {
-        // Load root scene.
-        if (!SceneManager.GetSceneByName(kRootSceneName).isLoaded)
+        // Load persistent scene.
+        if (!SceneManager.GetSceneByName(kPersistentSceneName).isLoaded)
         {
-            await SceneManager.LoadSceneAsync(kRootSceneName, LoadSceneMode.Additive)
+            await SceneManager.LoadSceneAsync(kPersistentSceneName, LoadSceneMode.Additive)
               .ToUniTask(cancellationToken: cancellationToken);
         }
 
-        Scene rootScene = SceneManager.GetSceneByName(kRootSceneName);
+        Scene persistentScene = SceneManager.GetSceneByName(kPersistentSceneName);
 
 #if UNITY_EDITOR
-        // Reorder root scene.
-        EditorSceneManager.MoveSceneBefore(rootScene, gameObject.scene);
+        // Reorder persistent scene.
+        EditorSceneManager.MoveSceneBefore(persistentScene, gameObject.scene);
 #endif
 
         // Build root LifetimeScope container.
-        if (rootScene.TryGetComponentInScene(out LifetimeScope rootLifetimeScope, true) && rootLifetimeScope.Container == null)
+        if (persistentScene.TryGetComponentInScene(out LifetimeScope persistentLifetimeScope, true) && persistentLifetimeScope.Container == null)
         {
-            await UniTask.RunOnThreadPool(() => rootLifetimeScope.Build(), cancellationToken: cancellationToken);
+            await UniTask.RunOnThreadPool(() => persistentLifetimeScope.Build(), cancellationToken: cancellationToken);
         }
-        return rootLifetimeScope;
+        return persistentLifetimeScope;
     }
 }

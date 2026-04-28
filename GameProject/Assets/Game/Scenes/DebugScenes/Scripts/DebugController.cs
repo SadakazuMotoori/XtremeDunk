@@ -33,7 +33,7 @@ public class DebugController : MonoBehaviour
 
     private void Update()
     {
-        PlayerInputManager inputManager = PlayerInputManager.Instance;
+        IPlayerInputManager inputManager = IPlayerInputManager.Instance;
         if (_itemTexts == null || inputManager == null)
         {
             return;

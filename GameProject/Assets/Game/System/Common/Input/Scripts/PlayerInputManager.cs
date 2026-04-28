@@ -46,7 +46,7 @@ public interface IPlayerInputManager : IService<IPlayerInputManager>
 public class PlayerInputManager : MonoBehaviour, IPlayerInputManager
 {
     // 既存コードがPlayerInputManager.Instanceを参照しているため、ServiceLocator経由の互換入口として残す。
-    public static PlayerInputManager Instance => IPlayerInputManager.Instance as PlayerInputManager;
+    private static PlayerInputManager Instance => IPlayerInputManager.Instance as PlayerInputManager;
 
     [SerializeField] PlayerInput _playerInput;
 

@@ -101,13 +101,13 @@ namespace WindowSystem
                         // 文字列がある時だけ
                         if (string.IsNullOrEmpty(_currentNormalWindow.InputActionMap) == false)
                         {
-                            PlayerInputManager.Instance.SwitchCurrentActionMap(_currentNormalWindow.InputActionMap);
+                            IPlayerInputManager.Instance.SwitchCurrentActionMap(_currentNormalWindow.InputActionMap);
                         }
                     }
                     else
                     {
                         // デフォルトに戻す
-                        PlayerInputManager.Instance.SwitchCurrentActionMap(null);
+                        IPlayerInputManager.Instance.SwitchCurrentActionMap(null);
                     }
                 }
                 else
@@ -121,7 +121,7 @@ namespace WindowSystem
                         // 文字列がある時だけ
                         if (string.IsNullOrEmpty(puWnd.InputActionMap) == false)
                         {
-                            PlayerInputManager.Instance.SwitchCurrentActionMap(puWnd.InputActionMap);
+                            IPlayerInputManager.Instance.SwitchCurrentActionMap(puWnd.InputActionMap);
                             return;
                         }
                     }

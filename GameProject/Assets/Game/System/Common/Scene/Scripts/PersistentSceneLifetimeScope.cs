@@ -95,7 +95,7 @@ public sealed class PersistentSceneLifetimeScope : LifetimeScope
         }
 
         // 何らかの理由でPlayerInputManagerが先に存在している場合も、重複生成しない。
-        if (PlayerInputManager.Instance != null)
+        if (IPlayerInputManager.Instance != null)
         {
             return;
         }
