@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Triggers;
 using DG.Tweening;
 using R3;
 using R3.Triggers;
@@ -7,9 +6,29 @@ using UnityEngine;
 
 namespace WindowSystem
 {
+    public enum FadeColors
+    {
+        Black,
+        White,
+    }
+
+    public enum FadeTypes
+    {
+        FadeIn,
+        FadeOut,
+    }
+
+    public enum FadePriorities
+    {
+        FullScreen,
+        UnderLoadingUI,
+        UnderHUD,
+    }
+
     public interface IWindowManager : IService<IWindowManager>
     {
         void SetNormalWindow(NormalWindow window);
+        UniTask RequestFade(FadeColors fadeColor, FadeTypes fadeType, int durationMilliseconds, FadePriorities priority);
         UniTask<TWindow> CreateWindow<TWindow>(object assetAddress, System.Func<TWindow, UniTask> onInitialize) where TWindow : WindowBase;
         UniTask CloseWindow(WindowBase window);
     }
@@ -21,7 +40,7 @@ namespace WindowSystem
     public class WindowManager : MonoBehaviour, IWindowManager
     {
         #region Singleton
-        public static WindowManager Instance => IWindowManager.Instance as WindowManager;
+        private static WindowManager Instance => IWindowManager.Instance as WindowManager;
 
         private void Awake()
         {
@@ -50,15 +69,23 @@ namespace WindowSystem
         [SerializeField] Transform _popupWindowGroup;
 
         // 暗幕への参照
-        [SerializeField] UnityEngine.UI.Image _imgBlackCurtrain;
-        Tween _tweenBlackCurtain;
+        [SerializeField] UnityEngine.UI.Image _imgFadeCurtrain;
+        Tween _tweenFadeCurtain;
+        Canvas _canvasFadeCurtain;
+        bool _isFadeCurtainInitialized;
+        int _fadeCurtainScreenWidth;
+        int _fadeCurtainScreenHeight;
+
+        const int kFadeSortingOrderFullScreen = 100;
+        const int kFadeSortingOrderUnderLoadingUI = 50;
+        const int kFadeSortingOrderUnderHUD = -50;
 
 
         NormalWindow _currentNormalWindow = null;
 
         void Initialize()
         {
-
+            InitializeFadeCurtain();
         }
 
         void Start()
@@ -124,6 +151,105 @@ namespace WindowSystem
         public void SetNormalWindow(NormalWindow window)
         {
             _currentNormalWindow = window;
+        }
+
+        public async UniTask RequestFade(FadeColors fadeColor, FadeTypes fadeType, int durationMilliseconds, FadePriorities priority)
+        {
+            InitializeFadeCurtain();
+            if (_imgFadeCurtrain == null) return;
+
+            UpdateFadeCurtainSize();
+            SetFadePriority(priority);
+
+            float targetAlpha = fadeType == FadeTypes.FadeIn ? 0 : 1;
+            float startAlpha = fadeType == FadeTypes.FadeIn ? 1 : 0;
+            SetFadeColor(fadeColor, startAlpha);
+
+            _imgFadeCurtrain.gameObject.SetActive(true);
+            _imgFadeCurtrain.raycastTarget = true;
+
+            _tweenFadeCurtain?.Kill();
+            _tweenFadeCurtain = null;
+
+            float duration = Mathf.Max(0, durationMilliseconds) / 1000.0f;
+            if (duration <= 0)
+            {
+                SetFadeColor(fadeColor, targetAlpha);
+                ApplyFadeEndState(targetAlpha);
+                return;
+            }
+
+            Tween tween = _imgFadeCurtrain.DOFade(targetAlpha, duration)
+                .SetEase(Ease.Linear)
+                .SetUpdate(true)
+                .SetLink(_imgFadeCurtrain.gameObject);
+            _tweenFadeCurtain = tween;
+
+            await tween;
+
+            if (_tweenFadeCurtain != tween) return;
+
+            _tweenFadeCurtain = null;
+            ApplyFadeEndState(targetAlpha);
+        }
+
+        void InitializeFadeCurtain()
+        {
+            if (_isFadeCurtainInitialized) return;
+            if (_imgFadeCurtrain == null) return;
+
+            _canvasFadeCurtain = _imgFadeCurtrain.GetComponentInParent<Canvas>();
+            UpdateFadeCurtainSize();
+            SetFadePriority(FadePriorities.FullScreen);
+            SetFadeColor(FadeColors.Black, 0);
+            _imgFadeCurtrain.raycastTarget = false;
+            _imgFadeCurtrain.gameObject.SetActive(false);
+            _isFadeCurtainInitialized = true;
+        }
+
+        void UpdateFadeCurtainSize()
+        {
+            if (_imgFadeCurtrain == null) return;
+            if (_fadeCurtainScreenWidth == Screen.width && _fadeCurtainScreenHeight == Screen.height) return;
+
+            var rectTransform = _imgFadeCurtrain.transform as RectTransform;
+            if (rectTransform == null) return;
+
+            _fadeCurtainScreenWidth = Screen.width;
+            _fadeCurtainScreenHeight = Screen.height;
+            rectTransform.sizeDelta = new Vector2(_fadeCurtainScreenWidth, _fadeCurtainScreenHeight);
+        }
+
+        void SetFadeColor(FadeColors fadeColor, float alpha)
+        {
+            Color color = fadeColor == FadeColors.White ? Color.white : Color.black;
+            color.a = alpha;
+            _imgFadeCurtrain.color = color;
+        }
+
+        void SetFadePriority(FadePriorities priority)
+        {
+            if (_canvasFadeCurtain == null) return;
+
+            switch (priority)
+            {
+                case FadePriorities.UnderHUD:
+                    _canvasFadeCurtain.sortingOrder = kFadeSortingOrderUnderHUD;
+                    break;
+                case FadePriorities.UnderLoadingUI:
+                    _canvasFadeCurtain.sortingOrder = kFadeSortingOrderUnderLoadingUI;
+                    break;
+                default:
+                    _canvasFadeCurtain.sortingOrder = kFadeSortingOrderFullScreen;
+                    break;
+            }
+        }
+
+        void ApplyFadeEndState(float alpha)
+        {
+            bool isVisible = alpha > 0;
+            _imgFadeCurtrain.raycastTarget = isVisible;
+            _imgFadeCurtrain.gameObject.SetActive(isVisible);
         }
 
         /// <summary>

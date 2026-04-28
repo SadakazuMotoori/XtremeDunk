@@ -1,6 +1,8 @@
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using WindowSystem;
 
 public class DebugController : MonoBehaviour
 {
@@ -17,6 +19,8 @@ public class DebugController : MonoBehaviour
 
     void Start()
     {
+        IWindowManager.Instance.RequestFade(FadeColors.Black, FadeTypes.FadeIn, 500, FadePriorities.FullScreen);
+
         Run();
     }
 
