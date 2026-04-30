@@ -29,6 +29,9 @@ public class DebugController : MonoBehaviour
         _itemTexts = new[] { _item1Text, _item2Text };
         RefreshSelection();
         await UniTask.CompletedTask;
+
+        // BGM鳴動テスト
+        // ISoundManager.Instance.PlayBGM("BGM01");
     }
 
     private void Update()

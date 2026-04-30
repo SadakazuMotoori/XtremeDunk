@@ -56,6 +56,10 @@ public sealed class PersistentSceneLifetimeScope : LifetimeScope
     [SerializeField] GameObject _inputManagerPrefab;
     GameObject _inputManagerInstance;
 
+    [Header("サウンド管理システム")]
+    [SerializeField] GameObject _soundManagerPrefab;
+    GameObject _soundManagerInstance;
+
     // PersistentSceneが起動時に生成するWindowManager Prefab。
     // ウィンドウ制御は全シーン共通で必要になるため、PersistentSceneで常駐させる。
     [Header("ウィンドウ管理システム")]
@@ -74,8 +78,9 @@ public sealed class PersistentSceneLifetimeScope : LifetimeScope
     private void Start()
     {
         // 常駐Managerは、シーン遷移を始める前に必要な順序で初期化する。
-        InitializeInputManager();
         InitializeMainCamera();
+        InitializeInputManager();
+        InitializeSoundManager();
         InitializeWindowManager();
         InitializeSceneTransitionManager();
 
@@ -113,6 +118,29 @@ public sealed class PersistentSceneLifetimeScope : LifetimeScope
         }
 
         _inputManagerInstance = Instantiate(_inputManagerPrefab, transform);
+    }
+
+    void InitializeSoundManager()
+    {
+        // すでにSoundManagerを生成済みなら、二重生成を避ける。
+        if (_soundManagerInstance != null)
+        {
+            return;
+        }
+
+        // 何らかの理由でPlayerInputManagerが先に存在している場合も、重複生成しない。
+        if (ISoundManager.Instance != null)
+        {
+            return;
+        }
+
+        if (_soundManagerPrefab == null)
+        {
+            Debug.LogError("SoundManager PrefabがRootSceneLifetimeScopeに設定されていません。");
+            return;
+        }
+
+        _soundManagerInstance = Instantiate(_soundManagerPrefab, transform);
     }
 
     void InitializeMainCamera()
