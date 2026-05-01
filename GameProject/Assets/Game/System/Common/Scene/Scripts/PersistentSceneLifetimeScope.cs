@@ -90,6 +90,16 @@ namespace SGGames.Game.Sys
         [SerializeField] GameObject _sceneTransitionManagerPrefab;
         GameObject _sceneTransitionManagerInstance;
 
+        //==========================================================================
+#if GAME_DEBUG && !IS_PRODUCT
+         // PersistentSceneが起動時に生成するDebugSystemManager Prefab.
+         // デバッグ機能管理は開発中全シーン共通で必要になるため、PersistentSceneで常駐させる.
+         [Header("デバッグシステム管理システム")]
+         [SerializeField] GameObject _debugSystemManagerPrefab;
+         GameObject _debugSystemManagerInstance;
+#endif
+        //==========================================================================
+
         protected override void Configure(IContainerBuilder builder)
         {
             builder.RegisterSceneLifecycle<PersistentSceneLifecycle>();
@@ -103,7 +113,9 @@ namespace SGGames.Game.Sys
             InitializeSoundManager();
             InitializeWindowManager();
             InitializeSceneTransitionManager();
-
+#if GAME_DEBUG && !IS_PRODUCT
+            InitializeDebugSystemManager();
+#endif          
             // 非製品版はデバッグシーン、製品版はタイトルシーンへ遷移する.
             string              _nextSceneName  = "";
     #if !IS_PRODUCT
@@ -230,5 +242,29 @@ namespace SGGames.Game.Sys
 
             _sceneTransitionManagerInstance = Instantiate(_sceneTransitionManagerPrefab, transform);
         }
+
+#if GAME_DEBUG && !IS_PRODUCT
+        void InitializeDebugSystemManager()
+        {
+            // DebugSystemManagerも他Managerと同様、既存登録があれば重複生成しない.
+            if (_debugSystemManagerInstance != null)
+            {
+                return;
+            }
+
+            if (IDebugSystemManager.Instance != null)
+            {
+                return;
+            }
+
+            if (_debugSystemManagerPrefab == null)
+            {
+                Debug.LogError("DebugSystemManager PrefabがRootSceneLifetimeScopeに設定されていません。");
+                return;
+            }
+
+            _debugSystemManagerInstance = Instantiate(_debugSystemManagerPrefab, transform);
+        }
+#endif
     }
 }
