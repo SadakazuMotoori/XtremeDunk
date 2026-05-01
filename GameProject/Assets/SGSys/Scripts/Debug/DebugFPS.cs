@@ -15,10 +15,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DebugFPS : SGSys.DebugFPS
-{
-}
-
 namespace SGSys
 {
     public class DebugFPS : MonoBehaviour
@@ -29,7 +25,6 @@ namespace SGSys
         private int		mFrames = 0;
         private float	mFps;
 
-        
         private static DebugFPS mInstance = null;
         
         public static DebugFPS Instance

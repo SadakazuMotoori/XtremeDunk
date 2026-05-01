@@ -22,6 +22,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
+using SGSys;
 namespace SGGames.Game.Sys
 {
     //==========================================================================
@@ -145,7 +146,7 @@ namespace SGGames.Game.Sys
 
             if (_inputManagerPrefab == null)
             {
-                Debug.LogError("InputManager PrefabがPersistentSceneLifetimeScopeに設定されていません。");
+                DebugLog.Error( SystemConst.DebugGroup.System, "InputManager : PrefabがPersistentSceneLifetimeScopeに設定されていません。");
                 return;
             }
 
@@ -168,7 +169,7 @@ namespace SGGames.Game.Sys
 
             if (_soundManagerPrefab == null)
             {
-                Debug.LogError("SoundManager PrefabがPersistentSceneLifetimeScopeに設定されていません。");
+                DebugLog.Error( SystemConst.DebugGroup.System, "SoundManager : PrefabがPersistentSceneLifetimeScopeに設定されていません。");
                 return;
             }
 
@@ -191,7 +192,7 @@ namespace SGGames.Game.Sys
 
             if (_mainCameraPrefab == null)
             {
-                Debug.LogError("MainCamera PrefabがPersistentSceneLifetimeScopeに設定されていません。");
+                DebugLog.Error( SystemConst.DebugGroup.System, "MainCamera : PrefabがPersistentSceneLifetimeScopeに設定されていません。");
                 return;
             }
 
@@ -214,7 +215,7 @@ namespace SGGames.Game.Sys
 
             if (_windowManagerPrefab == null)
             {
-                Debug.LogError("WindowManager PrefabがPersistentSceneLifetimeScopeに設定されていません。");
+                DebugLog.Error( SystemConst.DebugGroup.System, "WindowManager : PrefabがPersistentSceneLifetimeScopeに設定されていません。");
                 return;
             }
 
@@ -236,7 +237,7 @@ namespace SGGames.Game.Sys
 
             if (_sceneTransitionManagerPrefab == null)
             {
-                Debug.LogError("SceneTransitionManager PrefabがPersistentSceneLifetimeScopeに設定されていません。");
+                DebugLog.Error( SystemConst.DebugGroup.System, "SceneTransitionManager : PrefabがPersistentSceneLifetimeScopeに設定されていません。");
                 return;
             }
 
@@ -259,7 +260,7 @@ namespace SGGames.Game.Sys
 
             if (_debugSystemManagerPrefab == null)
             {
-                Debug.LogError("DebugSystemManager PrefabがPersistentSceneLifetimeScopeに設定されていません。");
+                DebugLog.Error( SystemConst.DebugGroup.System, "DebugSystemManager : PrefabがPersistentSceneLifetimeScopeに設定されていません。");
                 return;
             }
 

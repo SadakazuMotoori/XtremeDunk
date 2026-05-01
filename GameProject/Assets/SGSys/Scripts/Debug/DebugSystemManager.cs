@@ -24,7 +24,6 @@ namespace SGGames.Game.Sys
     //==========================================================================
     public interface IDebugSystemManager : IService<IDebugSystemManager>
     {
-    //    drawFPS();
     }
 
     //==========================================================================
@@ -72,6 +71,9 @@ namespace SGGames.Game.Sys
             {
                 SGSys.DebugFPS.Create(_debugFpsPrefab, transform);
             }
+
+            DebugLog.AddGroup(SystemConst.DebugGroup.System);
+            DebugLog.AddGroup(SystemConst.DebugGroup.Scene);
         }
     }
 }

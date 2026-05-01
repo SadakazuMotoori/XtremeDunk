@@ -22,10 +22,7 @@ namespace SGSys
         {
             public static string System		= "system";
             public static string Scene		= "scene";
-            public static string Net		= "net";
-            public static string Gfx		= "gfx";
         }
-        
         
         //================================================
         //! UnityのShaderLabで用意されているレンダリングキュー
