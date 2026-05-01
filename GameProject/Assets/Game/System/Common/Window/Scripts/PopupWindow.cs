@@ -5,7 +5,7 @@ using R3;
 using R3.Triggers;
 using UnityEngine;
 
-namespace WindowSystem
+namespace SGGames.Game.Sys
 {
     /// <summary>
     /// ポップアップウィンドウ基本クラス

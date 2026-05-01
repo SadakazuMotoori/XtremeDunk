@@ -7,7 +7,6 @@ using UniRx;
 using Unity.Cinemachine;
 using UnityEngine;
 
-// 再設計対象
 namespace SGGames.Game.Sys
 {
     public partial class CameraController : MonoBehaviour

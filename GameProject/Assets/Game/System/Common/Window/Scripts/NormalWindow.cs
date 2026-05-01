@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace WindowSystem
+namespace SGGames.Game.Sys
 {
     public class NormalWindow : MonoBehaviour
     {

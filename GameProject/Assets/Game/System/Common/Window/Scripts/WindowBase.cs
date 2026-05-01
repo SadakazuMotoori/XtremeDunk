@@ -6,7 +6,7 @@ using R3.Triggers;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Triggers;
 
-namespace WindowSystem
+namespace SGGames.Game.Sys
 {
     /// <summary>
     /// 

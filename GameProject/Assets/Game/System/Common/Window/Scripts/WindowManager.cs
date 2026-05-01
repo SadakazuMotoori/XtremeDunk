@@ -1,10 +1,13 @@
+using UnityEngine;
+
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using R3;
 using R3.Triggers;
-using UnityEngine;
 
-namespace WindowSystem
+using SGSys;
+
+namespace SGGames.Game.Sys
 {
     // フェード用Imageに設定する色。現状は黒と白のみを許可している。
     public enum FadeColors
