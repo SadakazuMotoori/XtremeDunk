@@ -53,3 +53,4 @@ MonoBehaviour:
   _soundManagerPrefab: {fileID: 2069406856906839868, guid: 9a6e506a79dcf054899d01c02848fa8a, type: 3}
   _windowManagerPrefab: {fileID: 5401000000000000001, guid: e51e29256ffe4af1b3408c956e8530e1, type: 3}
   _sceneTransitionManagerPrefab: {fileID: 3839099082425693125, guid: 28c1d6486235bfb4ea3927dc7b236934, type: 3}
+  _debugSystemManagerPrefab: {fileID: 1402558103861668910, guid: f6c255f119cfe4f4b96691688b5b5395, type: 3}

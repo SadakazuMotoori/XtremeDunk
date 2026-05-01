@@ -46,6 +46,15 @@ namespace SGGames.Game.Sys
 
         void Awake()
         {
+            UnityEngine.Object currentManager = IDebugSystemManager.Instance as UnityEngine.Object;
+            if (currentManager != null && currentManager != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            ServiceLocator<IDebugSystemManager>.Register(this);
+            InitializeDebugSystem();
         }
 
         void OnDestroy()
@@ -59,6 +68,10 @@ namespace SGGames.Game.Sys
 
         void InitializeDebugSystem()
         {
+            if (_debugFpsPrefab != null)
+            {
+                SGSys.DebugFPS.Create(_debugFpsPrefab, transform);
+            }
         }
     }
 }

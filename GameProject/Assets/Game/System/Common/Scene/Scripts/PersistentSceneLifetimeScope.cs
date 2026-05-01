@@ -145,7 +145,7 @@ namespace SGGames.Game.Sys
 
             if (_inputManagerPrefab == null)
             {
-                Debug.LogError("InputManager PrefabがRootSceneLifetimeScopeに設定されていません。");
+                Debug.LogError("InputManager PrefabがPersistentSceneLifetimeScopeに設定されていません。");
                 return;
             }
 
@@ -168,7 +168,7 @@ namespace SGGames.Game.Sys
 
             if (_soundManagerPrefab == null)
             {
-                Debug.LogError("SoundManager PrefabがRootSceneLifetimeScopeに設定されていません。");
+                Debug.LogError("SoundManager PrefabがPersistentSceneLifetimeScopeに設定されていません。");
                 return;
             }
 
@@ -191,7 +191,7 @@ namespace SGGames.Game.Sys
 
             if (_mainCameraPrefab == null)
             {
-                Debug.LogError("MainCamera PrefabがRootSceneLifetimeScopeに設定されていません。");
+                Debug.LogError("MainCamera PrefabがPersistentSceneLifetimeScopeに設定されていません。");
                 return;
             }
 
@@ -214,7 +214,7 @@ namespace SGGames.Game.Sys
 
             if (_windowManagerPrefab == null)
             {
-                Debug.LogError("WindowManager PrefabがRootSceneLifetimeScopeに設定されていません。");
+                Debug.LogError("WindowManager PrefabがPersistentSceneLifetimeScopeに設定されていません。");
                 return;
             }
 
@@ -236,7 +236,7 @@ namespace SGGames.Game.Sys
 
             if (_sceneTransitionManagerPrefab == null)
             {
-                Debug.LogError("SceneTransitionManager PrefabがRootSceneLifetimeScopeに設定されていません。");
+                Debug.LogError("SceneTransitionManager PrefabがPersistentSceneLifetimeScopeに設定されていません。");
                 return;
             }
 
@@ -259,7 +259,7 @@ namespace SGGames.Game.Sys
 
             if (_debugSystemManagerPrefab == null)
             {
-                Debug.LogError("DebugSystemManager PrefabがRootSceneLifetimeScopeに設定されていません。");
+                Debug.LogError("DebugSystemManager PrefabがPersistentSceneLifetimeScopeに設定されていません。");
                 return;
             }
 

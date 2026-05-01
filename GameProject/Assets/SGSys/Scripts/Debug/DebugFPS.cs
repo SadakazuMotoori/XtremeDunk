@@ -19,7 +19,8 @@ public class DebugFPS : SGSys.DebugFPS
 {
 }
 
-namespace SGSys {
+namespace SGSys
+{
     public class DebugFPS : MonoBehaviour
     {
         private const float UPDATE_INTERVAL = 0.5f; // この時間おきにFPSを計算して表示させる 
@@ -59,7 +60,7 @@ namespace SGSys {
             }
         }
         
-        public static DebugFPS Create( DebugFPS prefab )
+        public static DebugFPS Create( DebugFPS prefab, Transform parent = null )
         {
 #if GAME_DEBUG
             if ( !Debug.isDebugBuild )
@@ -68,7 +69,9 @@ namespace SGSys {
             }
             if ( false == GameObject.Find( "DebugFPS" ) )
             {
-                DebugFPS dfps = DebugFPS.Instantiate( prefab, new Vector3(0.95f, 0.99f, 0.0f), Quaternion.identity ) as DebugFPS;
+                DebugFPS dfps = parent != null
+                    ? DebugFPS.Instantiate( prefab, parent, false ) as DebugFPS
+                    : DebugFPS.Instantiate( prefab, new Vector3(0.95f, 0.99f, 0.0f), Quaternion.identity ) as DebugFPS;
                 dfps.gameObject.name = "DebugFPS";
                 DebugLog.Info( SystemConst.DebugGroup.System,"DebugFPS.Create");
                 return dfps;
@@ -86,8 +89,8 @@ namespace SGSys {
         
         private void Awake()
         {
-            DontDestroyOnLoad(this);
-            SetAnchorLL();
+            InitializeView();
+            SetAnchorUL();
 
             mShadow = m_Label.GetComponent<Shadow>();
         }
@@ -114,6 +117,41 @@ namespace SGSys {
                 m_Label.text += string.Format("\nGC.GetTotal {0:D} MB", System.GC.GetTotalMemory(false) / 1048576 );
 #endif
             }
+        }
+
+        private void InitializeView()
+        {
+            if (m_Label != null && m_baseRect == null)
+            {
+                m_baseRect = m_Label.rectTransform;
+            }
+
+            if (m_Label != null && m_baseRect != null)
+            {
+                return;
+            }
+
+            GameObject canvasObject = new GameObject("DebugFPSCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            canvasObject.transform.SetParent(transform, false);
+
+            Canvas canvas = canvasObject.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 10000;
+
+            GameObject labelObject = new GameObject("FPSLabel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text), typeof(Shadow));
+            labelObject.transform.SetParent(canvasObject.transform, false);
+
+            m_baseRect = labelObject.GetComponent<RectTransform>();
+            m_baseRect.sizeDelta = new Vector2(200, 30);
+            m_baseRect.anchoredPosition = new Vector2(8, -8);
+
+            m_Label = labelObject.GetComponent<Text>();
+            m_Label.text = "FPS : 0.000";
+            m_Label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            m_Label.fontSize = 16;
+            m_Label.alignment = TextAnchor.UpperLeft;
+            m_Label.raycastTarget = false;
+            m_Label.color = Color.white;
         }
 
         /// <summary>
