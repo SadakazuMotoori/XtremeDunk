@@ -1,29 +1,44 @@
-//==================================================================
-/// <summary>
-/// カメラ制御クラス
-/// </summary>
-//==================================================================
+//*****************************************************************************************************************
+//*****************************************************************************************************************
+//*****************************************************************************************************************
+/*!
+ *    @file     CameraController.cs
+ *    @brief    VirtualCamera制御
+ *
+ *    @date     2026/05/01
+ *    @author   Sadakazu Motoori
+ */
+//*****************************************************************************************************************
+//*****************************************************************************************************************
+//*****************************************************************************************************************
 using UniRx;
 using Unity.Cinemachine;
 using UnityEngine;
 
 namespace SGGames.Game.Sys
 {
+    //==========================================================================
+    /**
+     *    @brief       CameraManagerから操作されるVirtualCamera制御クラス.
+     */
+    //==========================================================================
     public partial class CameraController : MonoBehaviour
     {
         // このControllerが扱うVirtualCamera一覧。Inspector上の登録内容をCameraDataとして参照する。
         [SerializeField]
         private CameraData[] m_CameraTable;
 
-        // 
+        // Normal Cameraとして扱うCameraDataのIndex.
         [Header("※Normal CameraのみのIndex")]
         [SerializeField] int _nowNormalCameraIndex = 0;
 
-        /// <summary>
-        /// 対象のカメラ取得
-        /// </summary>
-        /// <param name="camid">カメラID</param>
-        /// <returns></returns>
+        //==========================================================================
+        /**
+         *    @brief       指定したカメラIDのCameraDataを取得する.
+         *    @param[in]   camid カメラID.
+         *    @return      対象のCameraData. 取得できない場合はnull.
+         */
+        //==========================================================================
         public CameraData GetCamera(CameraData.eCameraID camid)
         {
             return GetCameraData((int)camid);
@@ -78,7 +93,12 @@ namespace SGGames.Game.Sys
             }
         }
 
-        // 子GameObjectのVirtualCameraに、targetを設定
+        //==========================================================================
+        /**
+         *    @brief       管理中のVirtualCameraへ追従対象を設定する.
+         *    @param[in]   target 追従対象.
+         */
+        //==========================================================================
         public void SetCameraTarget(Transform target)
         {
             // ターゲット未設定でも後で設定できるよう、ここでは安全に何もしない。
@@ -92,10 +112,14 @@ namespace SGGames.Game.Sys
             }
         }
 
+        //==========================================================================
+        /**
+         *    @brief       1つのVirtualCameraに対する設定と操作窓口.
+         */
+        //==========================================================================
         [System.Serializable]
         public class CameraData
         {
-            // 1つのVirtualCameraに対する設定と、Managerから操作するための窓口をまとめる。
             [SerializeField]
             eCameraID m_CameraID;
             public eCameraID CameraID => m_CameraID;
@@ -108,10 +132,11 @@ namespace SGGames.Game.Sys
 
             public CameraController m_OwnerCtrl { get; private set; }
 
-            /// <summary>
-            /// カメラID
-            /// m_CameraTableに登録されているカメラ順
-            /// </summary>
+            //==========================================================================
+            /**
+             *    @brief       m_CameraTableに登録されているカメラ種別.
+             */
+            //==========================================================================
             public enum eCameraID
             {
                 Normal,

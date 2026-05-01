@@ -1,9 +1,16 @@
-//==================================================================
-/// <summary>
-/// ゲーム実行時初回から終了まで破棄される事がない常駐シーンクラス
-/// 各種システムマネージャは全てここで管理される
-/// </summary>
-//==================================================================
+//*****************************************************************************************************************
+//*****************************************************************************************************************
+//*****************************************************************************************************************
+/*!
+ *    @file     PersistentSceneLifetimeScope.cs
+ *    @brief    常駐シーン用LifetimeScope
+ *
+ *    @date     2026/05/01
+ *    @author   Sadakazu Motoori
+ */
+//*****************************************************************************************************************
+//*****************************************************************************************************************
+//*****************************************************************************************************************
 using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
 using MackySoft.Navigathena;
@@ -17,9 +24,14 @@ using VContainer.Unity;
 
 namespace SGGames.Game.Sys
 {
+    //==========================================================================
+    /**
+     *    @brief       PersistentScene用ライフサイクル.
+     */
+    //==========================================================================
     public sealed class PersistentSceneLifecycle : SceneLifecycleBase
     {
-        // PersistentScene自体のライフサイクル。常駐シーンなので現状は待機処理のみを行う。
+        // PersistentScene自体のライフサイクル. 常駐シーンなので現状は待機処理のみを行う.
         protected override async UniTask OnInitialize(ISceneDataReader reader, IProgress<IProgressDataStore> progress, CancellationToken cancellationToken)
         {
             await UniTask.DelayFrame(1);
@@ -40,33 +52,40 @@ namespace SGGames.Game.Sys
             await UniTask.DelayFrame(1);
         }
     }
-    //==================================================================
 
+    //==========================================================================
+    /**
+     *    @brief       ゲーム全体で共有するManager Prefabを生成するLifetimeScope.
+     */
+    //==========================================================================
     public sealed class PersistentSceneLifetimeScope : LifetimeScope
     {
-        // ゲーム全体で共有するManager Prefabを生成し、各ManagerのServiceLocator登録へつなぐ。
-        // PersistentSceneが起動時に生成するMainCamera Prefab。
-        // SerializeFieldで参照を持つことで、必須システムをビルドに含める。
+        // PersistentSceneが起動時に生成するMainCamera Prefab.
+        // SerializeFieldで参照を持つことで、必須システムをビルドに含める.
         [Header("カメラ管理システム")]
         [SerializeField] GameObject _mainCameraPrefab;
         GameObject _mainCameraInstance;
 
-        // PersistentSceneが起動時に生成するInputManager Prefab。
-        // 入力は全シーン共通で必要になるため、MainCameraと同じくPersistentSceneで常駐させる。
+        // PersistentSceneが起動時に生成するInputManager Prefab.
+        // 入力は全シーン共通で必要になるため、PersistentSceneで常駐させる.
         [Header("入力管理システム")]
         [SerializeField] GameObject _inputManagerPrefab;
         GameObject _inputManagerInstance;
 
+        // PersistentSceneが起動時に生成するSoundManager Prefab.
+        // サウンド再生は全シーン共通で必要になるため、PersistentSceneで常駐させる.
         [Header("サウンド管理システム")]
         [SerializeField] GameObject _soundManagerPrefab;
         GameObject _soundManagerInstance;
 
-        // PersistentSceneが起動時に生成するWindowManager Prefab。
-        // ウィンドウ制御は全シーン共通で必要になるため、PersistentSceneで常駐させる。
+        // PersistentSceneが起動時に生成するWindowManager Prefab.
+        // ウィンドウ制御は全シーン共通で必要になるため、PersistentSceneで常駐させる.
         [Header("ウィンドウ管理システム")]
         [SerializeField] GameObject _windowManagerPrefab;
         GameObject _windowManagerInstance;
 
+        // PersistentSceneが起動時に生成するSceneTransitionManager Prefab.
+        // シーン遷移制御は全シーン共通で必要になるため、PersistentSceneで常駐させる.
         [Header("シーン推移管理システム")]
         [SerializeField] GameObject _sceneTransitionManagerPrefab;
         GameObject _sceneTransitionManagerInstance;
@@ -78,14 +97,14 @@ namespace SGGames.Game.Sys
     
         private void Start()
         {
-            // 常駐Managerは、シーン遷移を始める前に必要な順序で初期化する。
+            // 常駐Managerは、シーン遷移を始める前に必要な順序で初期化する.
             InitializeMainCamera();
             InitializeInputManager();
             InitializeSoundManager();
             InitializeWindowManager();
             InitializeSceneTransitionManager();
 
-            // 製品版ならタイトルシーンへ
+            // 非製品版はデバッグシーン、製品版はタイトルシーンへ遷移する.
             string              _nextSceneName  = "";
     #if !IS_PRODUCT
             _nextSceneName = "DebugTopScene";
@@ -100,13 +119,13 @@ namespace SGGames.Game.Sys
 
         void InitializeInputManager()
         {
-            // すでにInputManagerを生成済みなら、二重生成を避ける。
+            // すでにInputManagerを生成済みなら、二重生成を避ける.
             if (_inputManagerInstance != null)
             {
                 return;
             }
 
-            // 何らかの理由でPlayerInputManagerが先に存在している場合も、重複生成しない。
+            // 何らかの理由でPlayerInputManagerが先に存在している場合も、重複生成しない.
             if (IPlayerInputManager.Instance != null)
             {
                 return;
@@ -123,13 +142,13 @@ namespace SGGames.Game.Sys
 
         void InitializeSoundManager()
         {
-            // すでにSoundManagerを生成済みなら、二重生成を避ける。
+            // すでにSoundManagerを生成済みなら、二重生成を避ける.
             if (_soundManagerInstance != null)
             {
                 return;
             }
 
-            // 何らかの理由でPlayerInputManagerが先に存在している場合も、重複生成しない。
+            // 何らかの理由でSoundManagerが先に存在している場合も、重複生成しない.
             if (ISoundManager.Instance != null)
             {
                 return;
@@ -146,13 +165,13 @@ namespace SGGames.Game.Sys
 
         void InitializeMainCamera()
         {
-            // すでにMainCameraを生成済みなら、二重生成を避ける。
+            // すでにMainCameraを生成済みなら、二重生成を避ける.
             if (_mainCameraInstance != null)
             {
                 return;
             }
 
-            // 何らかの理由でCameraManagerが先に存在している場合も、重複生成しない。
+            // 何らかの理由でCameraManagerが先に存在している場合も、重複生成しない.
             if (ICameraManager.Instance != null)
             {
                 return;
@@ -169,13 +188,13 @@ namespace SGGames.Game.Sys
 
         void InitializeWindowManager()
         {
-            // すでにWindowManagerを生成済みなら、二重生成を避ける。
+            // すでにWindowManagerを生成済みなら、二重生成を避ける.
             if (_windowManagerInstance != null)
             {
                 return;
             }
 
-            // 何らかの理由でWindowManagerが先に存在している場合も、重複生成しない。
+            // 何らかの理由でWindowManagerが先に存在している場合も、重複生成しない.
             if (IWindowManager.Instance != null)
             {
                 return;
@@ -192,7 +211,7 @@ namespace SGGames.Game.Sys
 
         void InitializeSceneTransitionManager()
         {
-            // SceneTransitionManagerも他Managerと同様、既存登録があれば重複生成しない。
+            // SceneTransitionManagerも他Managerと同様、既存登録があれば重複生成しない.
             if (_sceneTransitionManagerInstance != null)
             {
                 return;

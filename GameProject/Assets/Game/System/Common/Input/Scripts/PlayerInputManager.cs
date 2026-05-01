@@ -1,3 +1,16 @@
+//*****************************************************************************************************************
+//*****************************************************************************************************************
+//*****************************************************************************************************************
+/*!
+ *    @file     PlayerInputManager.cs
+ *    @brief    プレイヤー入力管理
+ *
+ *    @date     2026/05/01
+ *    @author   Sadakazu Motoori
+ */
+//*****************************************************************************************************************
+//*****************************************************************************************************************
+//*****************************************************************************************************************
 using R3;
 
 using UnityEngine;
@@ -6,52 +19,61 @@ using SGSys;
 
 namespace SGGames.Game.Sys
 {
-    /// <summary>
-    /// プレイヤー入力サービスの公開窓口。
-    /// 呼び出し側は具体クラスではなく IPlayerInputManager.Instance を使うことで、
-    /// CameraManager と同じServiceLocator経由で現在の入力管理インスタンスへアクセスできる。
-    /// </summary>
+    //==========================================================================
+    /**
+     *    @brief       プレイヤー入力サービスの公開窓口.
+     */
+    //==========================================================================
     public interface IPlayerInputManager : IService<IPlayerInputManager>
     {
-        // 入力管理システムの公開窓口。利用側はPlayerInputManager本体ではなくこのInterfaceへアクセスする。
-        /// <summary>
-        /// UI操作用の入力状態を取得する。
-        /// UISelectableなど、UI上の選択・決定・キャンセル処理はここから入力を読む。
-        /// </summary>
+        //==========================================================================
+        /**
+         *    @brief       UI操作用の入力状態を取得する.
+         *    @return      UI操作用入力状態.
+         */
+        //==========================================================================
         PlayerInputManager.UIActions UIAction { get; }
 
-        /// <summary>
-        /// 直近の入力デバイスがキーボード/マウス系かどうかを取得する。
-        /// 表示する操作説明やカーソル表示の切り替えで利用する。
-        /// </summary>
+        //==========================================================================
+        /**
+         *    @brief       直近の入力デバイスがキーボード/マウス系かどうかを取得する.
+         *    @return      キーボード/マウス系ならtrue.
+         */
+        //==========================================================================
         bool IsNowKeyboardMouseMode { get; }
 
-        /// <summary>
-        /// 入力デバイスが切り替わった時に通知されるObservable。
-        /// UI表示や操作説明を、最後に使われたデバイスに合わせたい時に購読する。
-        /// </summary>
+        //==========================================================================
+        /**
+         *    @brief       入力デバイスが切り替わった時に通知されるObservableを取得する.
+         *    @return      入力デバイス変更通知.
+         */
+        //==========================================================================
         Observable<PlayerInputManager.DevideTypes> OnChangeDevice { get; }
 
-        // trueの間はUI入力と入力デバイス検知を止め、フェード中などの誤操作を防ぐ。
+        // trueの間はUI入力と入力デバイス検知を止め、フェード中などの誤操作を防ぐ.
         bool IsInputBlocked { get; }
         void SetInputBlocked(bool isBlocked);
 
-        /// <summary>
-        /// 現在有効なInputActionMapを切り替える。
-        /// 画面状態に応じて、Gameplay用・UI用などの入力受付を切り替えるために使う。
-        /// </summary>
+        //==========================================================================
+        /**
+         *    @brief       現在有効なInputActionMapを切り替える.
+         *    @param[in]   mapName 切り替え先のActionMap名.
+         */
+        //==========================================================================
         void SwitchCurrentActionMap(string mapName);
     }
 
-    /// <summary>
-    /// プレイヤー入力管理
-    /// </summary>
+    //==========================================================================
+    /**
+     *    @brief       UnityのPlayerInputをServiceLocator経由で扱う入力管理クラス.
+     */
+    //==========================================================================
     [RequireComponent(typeof(PlayerInput))]
     [DefaultExecutionOrder(-1)]
     public class PlayerInputManager : MonoBehaviour, IPlayerInputManager
     {
-        // UnityのPlayerInputを包み、UIやGameplayから必要な入力状態を読みやすい形で提供する。
-        // 既存コードがPlayerInputManager.Instanceを参照しているため、ServiceLocator経由の互換入口として残す。
+        // UnityのPlayerInputを包み、UIやGameplayから必要な入力状態を読みやすい形で提供する.
+        // 既存コードがPlayerInputManager.Instanceを参照しているため、ServiceLocator経由の互換入口として残す.
         private static PlayerInputManager Instance => IPlayerInputManager.Instance as PlayerInputManager;
 
         [SerializeField] PlayerInput _playerInput;
@@ -74,7 +96,7 @@ namespace SGGames.Game.Sys
         //======================================
         public class UIActions
         {
-            // UI ActionMapの入力を、呼び出し側がboolで確認できる形に変換する。
+            // UI ActionMapの入力を、呼び出し側がboolで確認できる形に変換する.
             InputAction _axis { get; set; }
             InputAction _decide { get; set; }
             InputAction _cancel { get; set; }
@@ -82,7 +104,7 @@ namespace SGGames.Game.Sys
             InputAction _option2 { get; set; }
             bool _isInputBlocked;
 
-            // 入力ブロック中は、すべてのUI入力を「押されていない」ものとして扱う。
+            // 入力ブロック中は、すべてのUI入力を「押されていない」ものとして扱う.
             public bool AxisLeft => _isInputBlocked == false && _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().x < 0 : false;
             public bool AxisRight => _isInputBlocked == false && _axis != null && _axis.WasPerformedThisFrame() ? _axis.ReadValue<Vector2>().x > 0 : false;
 
@@ -97,13 +119,13 @@ namespace SGGames.Game.Sys
 
             public void SetInputBlocked(bool isBlocked)
             {
-                // Fade中など、画面操作を受け付けたくない期間だけtrueにする。
+                // Fade中など、画面操作を受け付けたくない期間だけtrueにする.
                 _isInputBlocked = isBlocked;
             }
 
             public void Initialize(InputActionMap actMap)
             {
-                // ActionMapが未設定でも、UI側がnull参照で止まらないようにする。
+                // ActionMapが未設定でも、UI側がnull参照で止まらないようにする.
                 if (actMap == null)
                 {
                     return;
@@ -124,14 +146,14 @@ namespace SGGames.Game.Sys
         public bool IsInputBlocked => _isInputBlocked;
         public void SetInputBlocked(bool isBlocked)
         {
-            // Manager本体とUIActionsの両方へ同じブロック状態を反映する。
+            // Manager本体とUIActionsの両方へ同じブロック状態を反映する.
             _isInputBlocked = isBlocked;
             _uiAction.SetInputBlocked(isBlocked);
         }
 
 
         //======================================
-        // 入力デバイスの種類
+        // 入力デバイスの種類.
         //======================================
         public enum DevideTypes
         {
@@ -145,34 +167,32 @@ namespace SGGames.Game.Sys
         }
         DevideTypes _lastInputDevice = DevideTypes.None;
 
-        // コントローラ識別用
+        // 入力デバイス識別用.
         private InputAction _deletectionKeyboard = new InputAction(type: InputActionType.PassThrough, binding: "<Keyboard>/AnyKey", interactions: "Press");
         private InputAction _deletectionXBOX = new InputAction(type: InputActionType.PassThrough, binding: "<XInputController>/*", interactions: "Press");
         private InputAction _deletectionDS = new InputAction(type: InputActionType.PassThrough, binding: "<DualShockGamepad>/*", interactions: "Press");
         private InputAction _deletectionSwitch = new InputAction(type: InputActionType.PassThrough, binding: "<SwitchProControllerHID>/*", interactions: "Press");
 
-        // 現在はキーマウ？
+        // 直近の入力デバイスがキーボード/マウス系かどうか.
         public bool IsNowKeyboardMouseMode => _lastInputDevice == DevideTypes.Keyboard;
 
 
         //======================================
-        //
         // イベント
-        //
         //======================================
 
-        // 入力デバイスが変更された時
+        // 入力デバイスが変更された時の通知.
         BehaviorSubject<DevideTypes> _onChangeDevice = new(DevideTypes.None);
         public Observable<DevideTypes> OnChangeDevice => _onChangeDevice;
 
 
 
         //======================================
-        // 
+        // 初期化.
         private void Awake()
         {
-            // PlayerInputManagerは全体で1つだけ使う。重複した場合は、先にServiceLocatorへ登録済みのものを優先する。
-            // ServiceLocatorはinterfaceで返すため、Unity独自のnull判定を使えるようObjectとして比較する。
+            // PlayerInputManagerは全体で1つだけ使う. 重複した場合は先に登録済みのものを優先する.
+            // ServiceLocatorはinterfaceで返すため、Unity独自のnull判定を使えるようObjectとして比較する.
             UnityEngine.Object currentManager = IPlayerInputManager.Instance as UnityEngine.Object;
             if (currentManager != null && currentManager != this)
             {
@@ -180,11 +200,11 @@ namespace SGGames.Game.Sys
                 return;
             }
 
-            // 他のクラスは IPlayerInputManager.Instance から、このManagerへアクセスする。
-            // 既存の PlayerInputManager.Instance も、この登録内容を参照する。
+            // 他のクラスは IPlayerInputManager.Instance から、このManagerへアクセスする.
+            // 既存の PlayerInputManager.Instance も、この登録内容を参照する.
             ServiceLocator<IPlayerInputManager>.Register(this);
 
-            // Prefab側の設定漏れがあっても、同じGameObject上のPlayerInputを自動取得する。
+            // Prefab側の設定漏れがあっても、同じGameObject上のPlayerInputを自動取得する.
             if (_playerInput == null)
             {
                 TryGetComponent(out _playerInput);
@@ -197,30 +217,27 @@ namespace SGGames.Game.Sys
                 return;
             }
 
-            // 初期設定
+            // Gameplay/UIのActionMapを初期化する.
             _gameplayAction.Initialize(_playerInput.actions.FindActionMap("Gameplay", false));
             _uiAction.Initialize(_playerInput.actions.FindActionMap("UI", false));
 
-            //
             _deletectionKeyboard.Enable();
             _deletectionXBOX.Enable();
             _deletectionDS.Enable();
             _deletectionSwitch.Enable();
-
-            // 
         }
 
         private void OnDestroy()
         {
-            // 自分が登録したサービスだけを解除し、別のPlayerInputManagerの登録を消さないようにする。
-            // interfaceのまま比較するとUnityのObject比較にならないため、Objectへ戻してから比較する。
+            // 自分が登録したサービスだけを解除し、別のPlayerInputManagerの登録を消さないようにする.
+            // interfaceのまま比較するとUnityのObject比較にならないため、Objectへ戻してから比較する.
             UnityEngine.Object currentManager = IPlayerInputManager.Instance as UnityEngine.Object;
             if (currentManager == this)
             {
                 ServiceLocator<IPlayerInputManager>.Unregister();
             }
 
-            // コードで作成したInputActionは、破棄時に明示的に解放する。
+            // コードで作成したInputActionは、破棄時に明示的に解放する.
             _deletectionKeyboard.Dispose();
             _deletectionXBOX.Dispose();
             _deletectionDS.Dispose();
@@ -232,16 +249,16 @@ namespace SGGames.Game.Sys
         {
             if (_isInputBlocked)
             {
-                // ブロック中はデバイス切り替え検知も含めて入力処理を停止する。
+                // ブロック中はデバイス切り替え検知も含めて入力処理を停止する.
                 return;
             }
 
-            // 入力デバイスの判定
+            // 入力デバイスを判定する.
             if (_deletectionKeyboard.triggered || (Mouse.current != null && Mouse.current.delta.magnitude > 0))
             {
                 if (_lastInputDevice != DevideTypes.Keyboard)
                 {
-                    // マウスアンロック中の場合は、カーソル表示
+                    // マウスアンロック中はカーソルを表示する.
                     if (Cursor.lockState == CursorLockMode.None)
                     {
                         Cursor.visible = true;
@@ -253,12 +270,12 @@ namespace SGGames.Game.Sys
                 }
             }
 
-            // XBOXコントローラー
+            // XBOXコントローラー.
             else if (_deletectionXBOX.triggered)
             {
                 if (_lastInputDevice != DevideTypes.XBOX)
                 {
-                    // マウスアンロック中の場合は、カーソル非表示
+                    // マウスアンロック中はカーソルを非表示にする.
                     if (Cursor.lockState == CursorLockMode.None)
                     {
                         Cursor.visible = false;
@@ -269,12 +286,12 @@ namespace SGGames.Game.Sys
                     _lastInputDevice = DevideTypes.XBOX;
                 }
             }
-            // PlayStationコントローラー
+            // PlayStationコントローラー.
             else if (_deletectionDS.triggered)
             {
                 if (_lastInputDevice != DevideTypes.PlayStation)
                 {
-                    // マウスアンロック中の場合は、カーソル非表示
+                    // マウスアンロック中はカーソルを非表示にする.
                     if (Cursor.lockState == CursorLockMode.None)
                     {
                         Cursor.visible = false;
@@ -285,12 +302,12 @@ namespace SGGames.Game.Sys
                     _lastInputDevice = DevideTypes.PlayStation;
                 }
             }
-            // Switchコントローラー
+            // Switchコントローラー.
             else if (_deletectionSwitch.triggered)
             {
                 if (_lastInputDevice != DevideTypes.Switch)
                 {
-                    // マウスアンロック中の場合は、カーソル非表示
+                    // マウスアンロック中はカーソルを非表示にする.
                     if (Cursor.lockState == CursorLockMode.None)
                     {
                         Cursor.visible = false;
@@ -303,9 +320,12 @@ namespace SGGames.Game.Sys
             }
         }
 
-        /// <summary>
-        /// ActionMapを変更
-        /// </summary>
+        //==========================================================================
+        /**
+         *    @brief       現在有効なInputActionMapを変更する.
+         *    @param[in]   mapName 切り替え先のActionMap名. 空ならdefaultActionMapへ戻す.
+         */
+        //==========================================================================
         public void SwitchCurrentActionMap(string mapName)
         {
             if (_playerInput == null)

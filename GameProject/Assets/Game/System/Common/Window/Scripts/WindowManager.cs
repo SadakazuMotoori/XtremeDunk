@@ -1,3 +1,16 @@
+//*****************************************************************************************************************
+//*****************************************************************************************************************
+//*****************************************************************************************************************
+/*!
+ *    @file     WindowManager.cs
+ *    @brief    Window管理
+ *
+ *    @date     2026/05/01
+ *    @author   Sadakazu Motoori
+ */
+//*****************************************************************************************************************
+//*****************************************************************************************************************
+//*****************************************************************************************************************
 using UnityEngine;
 
 using Cysharp.Threading.Tasks;
@@ -9,21 +22,33 @@ using SGSys;
 
 namespace SGGames.Game.Sys
 {
-    // フェード用Imageに設定する色。現状は黒と白のみを許可している。
+    //==========================================================================
+    /**
+     *    @brief       フェード用Imageに設定する色.
+     */
+    //==========================================================================
     public enum FadeColors
     {
         Black,
         White,
     }
 
-    // FadeInは幕を消す、FadeOutは幕を表示する指定として扱う。
+    //==========================================================================
+    /**
+     *    @brief       フェード幕の表示方向.
+     */
+    //==========================================================================
     public enum FadeTypes
     {
         FadeIn,
         FadeOut,
     }
 
-    // フェード幕をどのUIレイヤーの高さに置くかを指定する。
+    //==========================================================================
+    /**
+     *    @brief       フェード幕を配置するUIレイヤーの高さ.
+     */
+    //==========================================================================
     public enum FadePriorities
     {
         FullScreen,
@@ -31,22 +56,27 @@ namespace SGGames.Game.Sys
         UnderHUD,
     }
 
+    //==========================================================================
+    /**
+     *    @brief       Window関連システムの公開窓口.
+     */
+    //==========================================================================
     public interface IWindowManager : IService<IWindowManager>
     {
-        // Window関連システムの公開窓口。利用側はWindowManager本体ではなくこのInterfaceへアクセスする。
         void SetNormalWindow(NormalWindow window);
         UniTask RequestFade(FadeColors fadeColor, FadeTypes fadeType, int durationMilliseconds, FadePriorities priority);
         UniTask<TWindow> CreateWindow<TWindow>(object assetAddress, System.Func<TWindow, UniTask> onInitialize) where TWindow : WindowBase;
         UniTask CloseWindow(WindowBase window);
     }
 
-    /// <summary>
-    /// ウィンドウ管理クラス
-    /// </summary>
+    //==========================================================================
+    /**
+     *    @brief       PopupWindowの生成・破棄、入力Map切り替え、画面フェードを管理する.
+     */
+    //==========================================================================
     [DefaultExecutionOrder(-100000)]
     public class WindowManager : MonoBehaviour, IWindowManager
     {
-        // PopupWindowの生成・破棄、入力Map切り替え、画面フェードをまとめて管理する。
         #region Singleton
         private static WindowManager Instance => IWindowManager.Instance as WindowManager;
 
@@ -76,8 +106,7 @@ namespace SGGames.Game.Sys
         [Header("参照")]
         [SerializeField] Transform _popupWindowGroup;
 
-        // 暗幕への参照
-        // フェード幕として使うImage。Prefab側では1x1でも、初期化時に画面サイズへ広げる。
+        // フェード幕として使うImage. Prefab側では1x1でも、初期化時に画面サイズへ広げる.
         [SerializeField] UnityEngine.UI.Image _imgFadeCurtrain;
         Tween _tweenFadeCurtain;
         Canvas _canvasFadeCurtain;
@@ -99,16 +128,15 @@ namespace SGGames.Game.Sys
 
         void Start()
         {
-            // 開いているPopupの有無に応じて、利用するInputActionMapを切り替える。
-            // 
+            // 開いているPopupの有無に応じて、利用するInputActionMapを切り替える.
             void ChangeInputMode()
             {
                 if (_popupWindowGroup.childCount == 0)
                 {
-                    // ノーマルウィンドウが存在するなら、それの設定を使用
+                    // NormalWindowが存在するなら、それの設定を使用する.
                     if (_currentNormalWindow != null)
                     {
-                        // 文字列がある時だけ
+                        // ActionMap名が設定されている時だけ切り替える.
                         if (string.IsNullOrEmpty(_currentNormalWindow.InputActionMap) == false)
                         {
                             IPlayerInputManager.Instance.SwitchCurrentActionMap(_currentNormalWindow.InputActionMap);
@@ -116,19 +144,19 @@ namespace SGGames.Game.Sys
                     }
                     else
                     {
-                        // デフォルトに戻す
+                        // NormalWindowが無い場合はデフォルトに戻す.
                         IPlayerInputManager.Instance.SwitchCurrentActionMap(null);
                     }
                 }
                 else
                 {
-                    // 一番上のウィンドウのActionMapにする
+                    // 一番上のPopupWindowのActionMapにする.
                     for (int iChild = _popupWindowGroup.childCount - 1; iChild >= 0; iChild--)
                     {
                         var puWnd = _popupWindowGroup.GetChild(iChild).GetComponent<PopupWindow>();
                         if (puWnd == null) continue;
 
-                        // 文字列がある時だけ
+                        // ActionMap名が設定されている時だけ切り替える.
                         if (string.IsNullOrEmpty(puWnd.InputActionMap) == false)
                         {
                             IPlayerInputManager.Instance.SwitchCurrentActionMap(puWnd.InputActionMap);
@@ -138,18 +166,14 @@ namespace SGGames.Game.Sys
                 }
             }
 
-            //-------------------------------------------------
-            // 子ウィンドウの数が変化時、InputActionMapを変更
-            //-------------------------------------------------
+            // 子Window数が変化した時、InputActionMapを変更する.
             _popupWindowGroup.OnTransformChildrenChangedAsObservable()
                 .Subscribe(_ =>
                 {
                     ChangeInputMode();
                 }).AddTo(this);
 
-            //-------------------------------------------------
-            // ノーマルウィンドウが変更された時
-            //-------------------------------------------------
+            // NormalWindowが変更された時、InputActionMapを変更する.
             Observable.EveryValueChanged(this, x => _currentNormalWindow)
                 .Subscribe(_ =>
                 {
@@ -157,16 +181,30 @@ namespace SGGames.Game.Sys
                 });
         }
 
-        // 
+        //==========================================================================
+        /**
+         *    @brief       Popupが無い時の入力Map参照先を設定する.
+         *    @param[in]   window 現在の通常Window.
+         */
+        //==========================================================================
         public void SetNormalWindow(NormalWindow window)
         {
-            // Popupが無い時の入力Map参照先として、現在の通常Windowを保持する。
+            // Popupが無い時の入力Map参照先として、現在の通常Windowを保持する.
             _currentNormalWindow = window;
         }
 
+        //==========================================================================
+        /**
+         *    @brief       フェードを要求する.
+         *    @param[in]   fadeColor フェード色.
+         *    @param[in]   fadeType フェード種別.
+         *    @param[in]   durationMilliseconds フェード時間.
+         *    @param[in]   priority フェード表示優先度.
+         */
+        //==========================================================================
         public async UniTask RequestFade(FadeColors fadeColor, FadeTypes fadeType, int durationMilliseconds, FadePriorities priority)
         {
-            // リクエストごとに開始Alphaを決め直し、FadeIn/FadeOutの途中状態に依存しないようにする。
+            // リクエストごとに開始Alphaを決め直し、FadeIn/FadeOutの途中状態に依存しないようにする.
             InitializeFadeCurtain();
             if (_imgFadeCurtrain == null) return;
 
@@ -207,7 +245,7 @@ namespace SGGames.Game.Sys
 
         void InitializeFadeCurtain()
         {
-            // 初回だけCanvasやサイズを取得し、未使用時はRaycastも表示も無効にしておく。
+            // 初回だけCanvasやサイズを取得し、未使用時はRaycastも表示も無効にしておく.
             if (_isFadeCurtainInitialized) return;
             if (_imgFadeCurtrain == null) return;
 
@@ -222,7 +260,7 @@ namespace SGGames.Game.Sys
 
         void UpdateFadeCurtainSize()
         {
-            // 解像度が変わった時だけ、1x1のPrefab Imageを現在の画面サイズへ合わせ直す。
+            // 解像度が変わった時だけ、1x1のPrefab Imageを現在の画面サイズへ合わせ直す.
             if (_imgFadeCurtrain == null) return;
             if (_fadeCurtainScreenWidth == Screen.width && _fadeCurtainScreenHeight == Screen.height) return;
 
@@ -243,7 +281,7 @@ namespace SGGames.Game.Sys
 
         void SetFadePriority(FadePriorities priority)
         {
-            // CanvasのsortingOrderで、フェード幕をLoadingUI/HUDより上または下へ配置する。
+            // CanvasのsortingOrderで、フェード幕をLoadingUI/HUDより上または下へ配置する.
             if (_canvasFadeCurtain == null) return;
 
             switch (priority)
@@ -262,106 +300,101 @@ namespace SGGames.Game.Sys
 
         void ApplyFadeEndState(float alpha)
         {
-            // 完全に透明になった幕は非表示にし、入力を拾わない状態へ戻す。
+            // 完全に透明になった幕は非表示にし、入力を拾わない状態へ戻す.
             bool isVisible = alpha > 0;
             _imgFadeCurtrain.raycastTarget = isVisible;
             _imgFadeCurtrain.gameObject.SetActive(isVisible);
         }
 
-        /// <summary>
-        /// ウィンドウ生成
-        /// </summary>
-        /// <typeparam name="TWindow"></typeparam>
-        /// <param name="assetAddress">作成するウィンドウアセット</param>
-        /// <param name="onInitialize">ウィンドウのOnInitialize前に実行される関数</param>
-        /// <returns></returns>
+        //==========================================================================
+        /**
+         *    @brief       Windowアセットをロードして生成する.
+         *    @param[in]   assetAddress 作成するWindowアセット.
+         *    @param[in]   onInitialize WindowのOnInitialize前に実行される関数.
+         *    @return      生成したWindow.
+         */
+        //==========================================================================
         public async UniTask<TWindow> CreateWindow<TWindow>(object assetAddress, System.Func<TWindow, UniTask> onInitialize) where TWindow : WindowBase
         {
-            // アセットロード
+            // アセットをロードする.
             var handle = UnityEngine.AddressableAssets.Addressables.LoadAssetAsync<GameObject>(assetAddress);
-            // ロード待ち
+            // ロード完了を待つ.
             var asset = await handle;
             if(asset == null)
             {
                 return null;
             }
 
-            // 親GameObject
+            // Windowの親Transformを取得する.
             Transform parent = _popupWindowGroup;
 
-            // ウィンドウ作成
+            // Windowを生成する.
             var goWindow = Instantiate(asset, parent);
             var window = goWindow.GetComponent<TWindow>();
 
-            // ウィンドウ破棄される時に、アセットハンドルも解放されるように登録
+            // Window破棄時にアセットハンドルも解放されるように登録する.
             goWindow.OnDestroyAsObservable()
                 .Subscribe(_ =>
                 {
                     UnityEngine.AddressableAssets.Addressables.Release(handle);
                 });
 
-            // ウィンドウ初期設定
+            // Windowを初期化する.
             await InitWindow(window, onInitialize);
 
             return window;
         }
 
-        /// <summary>
-        /// ウィンドウを初期設定
-        /// </summary>
-        /// <param name="window"></param>
-        /// <returns></returns>
+        //==========================================================================
+        /**
+         *    @brief       生成したWindowを初期化して表示状態へ進める.
+         *    @param[in]   window 初期化するWindow.
+         *    @param[in]   onInitialize WindowのOnInitialize前に実行される関数.
+         */
+        //==========================================================================
         async UniTask InitWindow<TWindow>(TWindow window, System.Func<TWindow, UniTask> onInitialize) where TWindow : WindowBase
         {
-            //-----------------------------
-            // 非表示状態での初期化処理
-            //-----------------------------
-            // 非表示にする
+            // 非表示状態で初期化する.
             window.gameObject.SetActive(false);
 
             window.NowState = WindowBase.WindowStates.Initializing;
-            // 引数してい外部関数を実行
+            // 引数で指定された外部初期化関数を実行する.
             if(onInitialize != null)
             {
                 await onInitialize(window);
             }
-            // ウィンドウの初期化関数を実行
+            // Windowの初期化関数を実行する.
             await window.OnInitialize();
             window.NowState = WindowBase.WindowStates.Initialized;
 
-            //-----------------------------
-            // 表示状態での初期化処理
-            //-----------------------------
-            // 表示
+            // Activeにして表示処理へ進める.
             window.gameObject.SetActive(true);
 
             window.NowState = WindowBase.WindowStates.Showing;
-            // ウィンドウの表示関数を実行
+            // Windowの表示関数を実行する.
             await window.OnShow();
             window.NowState = WindowBase.WindowStates.Shown;
         }
 
-        /// <summary>
-        /// ウィンドウを閉じる
-        /// </summary>
-        /// <param name="window"></param>
-        /// <returns></returns>
+        //==========================================================================
+        /**
+         *    @brief       Windowを閉じて破棄する.
+         *    @param[in]   window 閉じるWindow.
+         */
+        //==========================================================================
         public async UniTask CloseWindow(WindowBase window)
         {
-            // 既に首領中
+            // 既に終了中なら何もしない.
             if (window.NowState == WindowBase.WindowStates.Closeing) return;
 
-            // 表示状態まで待つ
+            // 表示状態まで待つ.
             await window.WaitForShown();
 
-
-            //-----------------------------
-            // 破棄時の処理
-            //-----------------------------
+            // 破棄時の処理を実行する.
             window.NowState = WindowBase.WindowStates.Closeing;
             await window.OnClose();
 
-            // 破棄
+            // Windowを破棄する.
             Destroy(window.gameObject);
         }
     }

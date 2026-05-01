@@ -1,8 +1,16 @@
-//==================================================================
-/// <summary>
-/// カメラ管理クラス
-/// </summary>
-//==================================================================
+//*****************************************************************************************************************
+//*****************************************************************************************************************
+//*****************************************************************************************************************
+/*!
+ *    @file     CameraManager.cs
+ *    @brief    カメラ管理
+ *
+ *    @date     2026/05/01
+ *    @author   Sadakazu Motoori
+ */
+//*****************************************************************************************************************
+//*****************************************************************************************************************
+//*****************************************************************************************************************
 using System.Collections.Generic;
 using UniRx;
 using UnityEngine;
@@ -12,9 +20,13 @@ using SGSys;
 
 namespace SGGames.Game.Sys
 {
+    //==========================================================================
+    /**
+     *    @brief       カメラ関連システムの公開窓口.
+     */
+    //==========================================================================
     public interface ICameraManager : IService<ICameraManager>
     {
-        // カメラ関連システムの公開窓口。利用側はCameraManager本体ではなくこのInterfaceへアクセスする。
         //======================================
         // プレイヤーカメラ関係
         //======================================
@@ -29,7 +41,7 @@ namespace SGGames.Game.Sys
         Camera UICamera             { get; }
         Camera CurrentMainCamera    { get; }
 
-        // ワールド座標からUI座標へ変換
+        // ワールド座標をUI座標へ変換する.
         Vector2? ConvertWorldToUIPos(Vector3 worldPos) { return Vector2.zero; }
 
         void ManageMainCamera(ManagedMainCamera camera);
@@ -38,7 +50,12 @@ namespace SGGames.Game.Sys
         void UpdateManagedMainCameraList();
     }
 
-    // 他のカメラ系コンポーネントより先にServiceLocatorへ登録したいので、実行順を早めている。
+    //==========================================================================
+    /**
+     *    @brief       現在有効なCameraControllerとMainCameraを一元管理する.
+     */
+    //==========================================================================
+    // 他のカメラ系コンポーネントより先にServiceLocatorへ登録するため、実行順を早める.
     [DefaultExecutionOrder(-10000)]
     public class CameraManager : MonoBehaviour, ICameraManager
     {
@@ -115,7 +132,13 @@ namespace SGGames.Game.Sys
         }
         public ManagedMainCamera CurrentMainCamera2 => _currentMainCamera;
 
-        // ワールド座標からUI座標へ変換
+        //==========================================================================
+        /**
+         *    @brief       ワールド座標をUI基準Rect上の座標へ変換する.
+         *    @param[in]   worldPos ワールド座標.
+         *    @return      UI座標. 変換できない場合はnull.
+         */
+        //==========================================================================
         public Vector2? ConvertWorldToUIPos(Vector3 worldPos)
         {
             // UI座標変換には「現在のメインカメラ」「UIカメラ」「UI基準Rect」がすべて必要。
@@ -135,7 +158,12 @@ namespace SGGames.Game.Sys
             return pos;
         }
 
-        // メインカメラ登録
+        //==========================================================================
+        /**
+         *    @brief       メインカメラ候補を登録する.
+         *    @param[in]   mainCamera 登録するメインカメラ候補.
+         */
+        //==========================================================================
         public void ManageMainCamera(ManagedMainCamera mainCamera)
         {
             // OnEnable/Startの実行順によってnullが来ても、管理リストを壊さない。
@@ -145,11 +173,16 @@ namespace SGGames.Game.Sys
 
             _managedMainCameras.Add(mainCamera);
 
-            // 更新
+            // 現在のメインカメラ候補を再評価する.
             UpdateManagedMainCameraList();
         }
 
-        // メインカメラ登録解除
+        //==========================================================================
+        /**
+         *    @brief       メインカメラ候補の登録を解除する.
+         *    @param[in]   mainCamera 登録解除するメインカメラ候補.
+         */
+        //==========================================================================
         public void UnmanageMainCamera(ManagedMainCamera mainCamera)
         {
             // 破棄中や無効化中にnull扱いになっても、安全に無視する。
@@ -157,26 +190,26 @@ namespace SGGames.Game.Sys
 
             _managedMainCameras.Remove(mainCamera);
 
-            // 更新
+            // 現在のメインカメラ候補を再評価する.
             UpdateManagedMainCameraList();
         }
 
-        /// <summary>
-        /// メインカメラリストの更新処理
-        /// ・nullチェック
-        /// ・カレントメインカメラ検索＆有効/無効化
-        /// </summary>
+        //==========================================================================
+        /**
+         *    @brief       メインカメラ候補を整理し、最優先のカメラだけを有効化する.
+         */
+        //==========================================================================
         public void UpdateManagedMainCameraList()
         {
             _currentMainCamera = null;
 
-            // nullの物を削除
+            // 破棄済み参照を削除する.
             _managedMainCameras.RemoveWhere(x => x == null);
 
-            // 最優先カメラ検索
+            // 最も優先順位の高いカメラを検索する.
             foreach (var managedCam in _managedMainCameras)
             {
-                // ManageCamera自体が無効なら、無視する
+                // ManagedMainCamera自体が無効なら、候補から外す.
                 if (managedCam.enabled == false)
                 {
                     continue;
@@ -188,7 +221,7 @@ namespace SGGames.Game.Sys
                     continue;
                 }
 
-                // 最も優先順位の高いカメラを残す
+                // 同じ優先順位の場合は、後から評価したカメラを優先する.
                 if (_currentMainCamera == null)
                 {
                     _currentMainCamera = managedCam;
@@ -199,7 +232,7 @@ namespace SGGames.Game.Sys
                 }
             }
 
-            // 最優先カメラのみ有効、その他はすべて無効
+            // 最優先カメラのみ有効化し、その他はすべて無効化する.
             foreach (var managedCam in _managedMainCameras)
             {
                 if (_currentMainCamera == managedCam)
@@ -253,6 +286,13 @@ namespace SGGames.Game.Sys
             }
         }
 
+        //==========================================================================
+        /**
+         *    @brief       CinemachineBrainのデフォルトブレンド時間を一時変更する.
+         *    @param[in]   duration 設定するブレンド時間.
+         *    @return      変更前のブレンド時間.
+         */
+        //==========================================================================
         public float SetCinemachineBrainDefaultBlendTime(float duration)
         {
             // ActiveBrainが1つもない場合、GetActiveBrain(0)自体が失敗するため先に件数を確認する。
@@ -308,7 +348,7 @@ namespace SGGames.Game.Sys
 
         void Start()
         {
-            // バトルカメラが変更された
+            // CameraControllerの変更を監視し、設定済みターゲットを再反映する.
             this.ObserveEveryValueChanged(x => _CameraCtrl)
                 .Subscribe(ctrl =>
                 {
@@ -318,7 +358,7 @@ namespace SGGames.Game.Sys
                     }
                 });
 
-            // 
+            // 現在カメラ種別の変更を通知用ReactivePropertyへ反映する.
             this.ObserveEveryValueChanged(x => CurrentCamData)
                 .Subscribe(camData =>
                 {
