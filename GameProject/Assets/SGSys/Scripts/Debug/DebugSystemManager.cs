@@ -73,6 +73,7 @@ namespace SGGames.Game.Sys
             }
 
             DebugLog.AddGroup(SystemConst.DebugGroup.System);
+            DebugLog.AddGroup(SystemConst.DebugGroup.Game);
             DebugLog.AddGroup(SystemConst.DebugGroup.Scene);
         }
     }

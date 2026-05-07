@@ -34,7 +34,6 @@ namespace SGGames.Game.Develop
 
         private void Awake()
         {
-            Debug.Log("[Window] Awake");
         }
 
         void Start()

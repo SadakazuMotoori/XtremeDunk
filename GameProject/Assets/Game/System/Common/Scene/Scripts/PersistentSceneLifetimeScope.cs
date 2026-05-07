@@ -61,6 +61,16 @@ namespace SGGames.Game.Sys
     //==========================================================================
     public sealed class PersistentSceneLifetimeScope : LifetimeScope
     {
+//==========================================================================
+#if GAME_DEBUG && !IS_PRODUCT
+         // PersistentSceneが起動時に生成するDebugSystemManager Prefab.
+         // デバッグ機能管理は開発中全シーン共通で必要になるため、PersistentSceneで常駐させる.
+         [Header("デバッグシステム管理システム")]
+         [SerializeField] GameObject _debugSystemManagerPrefab;
+         GameObject _debugSystemManagerInstance;
+#endif
+//==========================================================================
+
         // PersistentSceneが起動時に生成するMainCamera Prefab.
         // SerializeFieldで参照を持つことで、必須システムをビルドに含める.
         [Header("カメラ管理システム")]
@@ -91,16 +101,6 @@ namespace SGGames.Game.Sys
         [SerializeField] GameObject _sceneTransitionManagerPrefab;
         GameObject _sceneTransitionManagerInstance;
 
-        //==========================================================================
-#if GAME_DEBUG && !IS_PRODUCT
-         // PersistentSceneが起動時に生成するDebugSystemManager Prefab.
-         // デバッグ機能管理は開発中全シーン共通で必要になるため、PersistentSceneで常駐させる.
-         [Header("デバッグシステム管理システム")]
-         [SerializeField] GameObject _debugSystemManagerPrefab;
-         GameObject _debugSystemManagerInstance;
-#endif
-        //==========================================================================
-
         protected override void Configure(IContainerBuilder builder)
         {
             builder.RegisterSceneLifecycle<PersistentSceneLifecycle>();
@@ -109,21 +109,22 @@ namespace SGGames.Game.Sys
         private void Start()
         {
             // 常駐Managerは、シーン遷移を始める前に必要な順序で初期化する.
+#if GAME_DEBUG && !IS_PRODUCT
+            InitializeDebugSystemManager();
+#endif
             InitializeMainCamera();
             InitializeInputManager();
             InitializeSoundManager();
             InitializeWindowManager();
             InitializeSceneTransitionManager();
-#if GAME_DEBUG && !IS_PRODUCT
-            InitializeDebugSystemManager();
-#endif          
+          
             // 非製品版はデバッグシーン、製品版はタイトルシーンへ遷移する.
             string              _nextSceneName  = "";
-    #if !IS_PRODUCT
+#if !IS_PRODUCT
             _nextSceneName = "DebugTopScene";
-    #else
+#else
             _nextSceneName = "TitleScene";
-    #endif
+#endif
             if (!SceneManager.GetSceneByName(_nextSceneName).isLoaded)
             {
                 ISceneTransitionManager.Instance.RequestSceneChange(_nextSceneName).Forget();

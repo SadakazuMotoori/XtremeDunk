@@ -21,6 +21,7 @@ namespace SGSys
         public static class DebugGroup
         {
             public static string System		= "system";
+            public static string Game		= "game";
             public static string Scene		= "scene";
         }
         

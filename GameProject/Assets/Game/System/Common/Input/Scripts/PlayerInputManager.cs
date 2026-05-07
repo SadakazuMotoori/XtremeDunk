@@ -212,7 +212,9 @@ namespace SGGames.Game.Sys
 
             if (_playerInput == null || _playerInput.actions == null)
             {
-                Debug.LogError("PlayerInputManagerにPlayerInput、またはInputActionが設定されていません。");
+#if GAME_DEBUG && !IS_PRODUCT
+                DebugLog.Error(SystemConst.DebugGroup.System,"PlayerInputManagerにPlayerInput、またはInputActionが設定されていません。");
+#endif
                 enabled = false;
                 return;
             }
@@ -263,8 +265,9 @@ namespace SGGames.Game.Sys
                     {
                         Cursor.visible = true;
                     }
-
-                    Debug.Log("[Inputデバイス変更]キーボード");
+#if GAME_DEBUG && !IS_PRODUCT
+                    DebugLog.Info(SystemConst.DebugGroup.System,"[Inputデバイス変更]キーボード");
+#endif
                     _onChangeDevice.OnNext(DevideTypes.Keyboard);
                     _lastInputDevice = DevideTypes.Keyboard;
                 }
@@ -280,8 +283,9 @@ namespace SGGames.Game.Sys
                     {
                         Cursor.visible = false;
                     }
-
-                    Debug.Log("[Inputデバイス変更]XBOXコントローラ");
+#if GAME_DEBUG && !IS_PRODUCT
+                    DebugLog.Info(SystemConst.DebugGroup.System,"[Inputデバイス変更]XBOXコントローラ");
+#endif
                     _onChangeDevice.OnNext(DevideTypes.XBOX);
                     _lastInputDevice = DevideTypes.XBOX;
                 }
@@ -296,8 +300,9 @@ namespace SGGames.Game.Sys
                     {
                         Cursor.visible = false;
                     }
-
-                    Debug.Log("[Inputデバイス変更]デュアルショック");
+#if GAME_DEBUG && !IS_PRODUCT
+                    DebugLog.Info(SystemConst.DebugGroup.System,"[Inputデバイス変更]デュアルショック");
+#endif
                     _onChangeDevice.OnNext(DevideTypes.PlayStation);
                     _lastInputDevice = DevideTypes.PlayStation;
                 }
@@ -312,8 +317,9 @@ namespace SGGames.Game.Sys
                     {
                         Cursor.visible = false;
                     }
-
-                    Debug.Log("[Inputデバイス変更]Switchコントローラ");
+#if GAME_DEBUG && !IS_PRODUCT
+                    DebugLog.Info(SystemConst.DebugGroup.System,"[Inputデバイス変更]Switchコントローラ");
+#endif
                     _onChangeDevice.OnNext(DevideTypes.Switch);
                     _lastInputDevice = DevideTypes.Switch;
                 }
@@ -336,12 +342,16 @@ namespace SGGames.Game.Sys
             if (string.IsNullOrEmpty(mapName) == false)
             {
                 _playerInput.SwitchCurrentActionMap(mapName);
-                Debug.Log($"[PlayerInputManager] ****** SwitchCurrentActionMap : {mapName}");
+#if GAME_DEBUG && !IS_PRODUCT
+                DebugLog.Info( SystemConst.DebugGroup.System, $"[PlayerInputManager] ****** SwitchCurrentActionMap : {mapName}");
+#endif
             }
             else
             {
                 _playerInput.SwitchCurrentActionMap(_playerInput.defaultActionMap);
-                Debug.Log($"[PlayerInputManager] ****** SwitchCurrentActionMap : {_playerInput.defaultActionMap}");
+#if GAME_DEBUG && !IS_PRODUCT
+                DebugLog.Info( SystemConst.DebugGroup.System, $"[PlayerInputManager] ****** SwitchCurrentActionMap : {_playerInput.defaultActionMap}");
+#endif
             }
         }
     }
