@@ -113,6 +113,11 @@ namespace SGGames.Game.Sys
                 await GlobalSceneNavigator.Instance.Replace(sceneIdentifier);
                 await UniTask.DelayFrame(1);
 
+                if (ICameraManager.Instance != null)
+                {
+                    ICameraManager.Instance.SetMainCameraRenderingEnabled(true);
+                }
+
                 // シーン差し替え後、1フレーム待って新しいUIが出揃ってからFadeInを始める.
                 if (IWindowManager.Instance != null)
                 {

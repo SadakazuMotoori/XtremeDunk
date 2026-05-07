@@ -40,6 +40,7 @@ namespace SGGames.Game.Sys
 
         Camera UICamera             { get; }
         Camera CurrentMainCamera    { get; }
+        void SetMainCameraRenderingEnabled(bool enabled);
 
         // ワールド座標をUI座標へ変換する.
         Vector2? ConvertWorldToUIPos(Vector3 worldPos) { return Vector2.zero; }
@@ -122,6 +123,7 @@ namespace SGGames.Game.Sys
         HashSet<ManagedMainCamera> _managedMainCameras = new();
         // 現在のメインカメラ
         ManagedMainCamera _currentMainCamera;
+        bool _isMainCameraRenderingEnabled = false;
         public Camera CurrentMainCamera
         {
             get
@@ -131,6 +133,12 @@ namespace SGGames.Game.Sys
             }
         }
         public ManagedMainCamera CurrentMainCamera2 => _currentMainCamera;
+
+        public void SetMainCameraRenderingEnabled(bool enabled)
+        {
+            _isMainCameraRenderingEnabled = enabled;
+            UpdateManagedMainCameraList();
+        }
 
         //==========================================================================
         /**
@@ -243,7 +251,7 @@ namespace SGGames.Game.Sys
                     }
 
                     // 最優先のカメラだけを実際に描画する。
-                    managedCam.Cam.enabled = true;
+                    managedCam.Cam.enabled = _isMainCameraRenderingEnabled;
 
                     var cameraData = _currentMainCamera.Cam.GetUniversalAdditionalCameraData();
 

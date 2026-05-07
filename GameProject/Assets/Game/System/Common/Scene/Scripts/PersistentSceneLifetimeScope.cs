@@ -127,7 +127,7 @@ namespace SGGames.Game.Sys
 #endif
             if (!SceneManager.GetSceneByName(_nextSceneName).isLoaded)
             {
-                ISceneTransitionManager.Instance.RequestSceneChange(_nextSceneName).Forget();
+                ISceneTransitionManager.Instance.RequestSceneChange(_nextSceneName,0).Forget();
             }
         }
 
