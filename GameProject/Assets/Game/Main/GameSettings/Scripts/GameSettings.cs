@@ -120,15 +120,18 @@ namespace SGGames.Game
         }
 
         void InitializeForceQuit()
-        {
-/*            
-            if ( !PlayerPrefs.HasKey("Pause") ) {
+        {           
+            if ( !PlayerPrefs.HasKey("Pause") )
+            {
                 PlayerPrefs.SetInt( "Pause", 1 );
             }
             int pause = PlayerPrefs.GetInt("Pause");
-            if ( 0 < pause ) {
+            if ( 0 < pause )
+            {
                 GameSettings.forceQuit = false;
-            } else {
+            }
+            else
+            {
                 GameSettings.forceQuit = true;
             }
             PlayerPrefs.SetInt("Pause",0);
@@ -137,7 +140,6 @@ namespace SGGames.Game
 #if !UNITY_EDITOR && GAME_DEBUG
             Debug.Log("GameSettings.InitializeForceQuit : " + GameSettings.forceQuit );
 #endif
-*/
         }
 
         /// <summary>
@@ -146,27 +148,26 @@ namespace SGGames.Game
         void LoadPrefs()
         {
             mLanguage = (Language)PlayerPrefs.GetInt("Language", (int)Language.Japanese );
+            mSound.Load();
 /*
             mGraphics.Load();
             mPlay.Load();
             mNotification.Load();
-            mSound.Load();
 */            
         }
-
-
-
 
         /// <summary>
         /// GameSetting作成
         /// </summary>
         public static void Create()
-        {
-/*            
-            GameManager.AddComponent<GameSettings>();
-*/            
+        {           
+            Component gameManager = IGameManager.Instance as Component;
+            if (gameManager == null)
+            {
+                return;
+            }
+
+            gameManager.gameObject.AddComponent<GameSettings>();           
         }
-
-
     }
 }

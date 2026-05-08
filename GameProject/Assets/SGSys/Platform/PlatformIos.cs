@@ -40,7 +40,7 @@ namespace SGSys
             SGSysUtility_Initialize();
 
             GameObject obj = new GameObject("PlatformIos");
-            GameObject systemRoot = GameObject.Find("PersistentSceneLifetimeScope");
+            GameObject systemRoot = GameObject.Find("GameManager");
             if (systemRoot != null)
             {
                 obj.transform.SetParent(systemRoot.transform);
