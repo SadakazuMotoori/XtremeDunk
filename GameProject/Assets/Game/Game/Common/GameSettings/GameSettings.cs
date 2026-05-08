@@ -58,25 +58,27 @@ namespace SGGames.Game
 
         private static GameSettings Instance    { get; set; }
 
+        private Sound mSound;
 /*
         private Play            mPlay;
         private Notification    mNotification;
-        private Sound           mSound;
         private Graphics        mGraphics;
 */
+        private static Sound sound { get { return Instance.mSound; } }
 /*
         private static Play play { get { return Instance.mPlay; } }
         private static Notification notification { get { return Instance.mNotification; } }
-        private static Sound sound { get { return Instance.mSound; } }
         private static Graphics graphics { get { return Instance.mGraphics; } }
 */
 
-        void Awake() {
+        void Awake()
+        {
             Instance = this;
+
+            mSound = new Sound();
 /*            
             mPlay = new Play();
             mNotification = new Notification();
-            mSound = new Sound();
             mGraphics = new Graphics();
 */
             InitializeLanguage();
@@ -104,18 +106,17 @@ namespace SGGames.Game
         }
 
         void InitializeLanguage()
-        {
-/*            
-            switch ( SGSys.Platform.GetLanguage() ) {
-            case SGSys.SystemConst.Language.Japanese:
-                mAwakeLanguage = Language.Japanese;
-                break;
-            default:
-                mAwakeLanguage = Language.English;
-                break;
+        {  
+            switch ( SGSys.Platform.GetLanguage() )
+            {
+                case SGSys.SystemConst.Language.Japanese:
+                    mAwakeLanguage = Language.Japanese;
+                    break;
+                default:
+                    mAwakeLanguage = Language.English;
+                    break;
             }
-            GameSettings.language = GameSettings.awakeLanguage;
-*/            
+            GameSettings.language = GameSettings.awakeLanguage;         
         }
 
         void InitializeForceQuit()
