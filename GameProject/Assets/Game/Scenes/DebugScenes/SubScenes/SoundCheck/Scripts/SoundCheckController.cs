@@ -2,10 +2,10 @@
 //*****************************************************************************************************************
 //*****************************************************************************************************************
 /*!
- *    @file     DebugController.cs
- *    @brief    デバッグシーン制御
+ *    @file     SoundCheckController.cs
+ *    @brief    サウンドチェックシーン制御
  *
- *    @date     2026/05/01
+ *    @date     2026/05/08
  *    @author   Sadakazu Motoori
  */
 //*****************************************************************************************************************
@@ -20,21 +20,17 @@ namespace SGGames.Game.Develop
 {
     //==========================================================================
     /**
-     *    @brief       デバッグシーン上の簡易メニューを制御する.
+     *    @brief       サウンドチェックシーン上の簡易メニューを制御する.
      */
     //==========================================================================
-    public class DebugController : MonoBehaviour
+    public class SoundCheckController : MonoBehaviour
     {
-        // デバッグシーン上に表示する簡易メニュー項目.
+        // サウンドチェックシーン上に表示する簡易メニュー項目.
         [SerializeField] TextMeshProUGUI _item1Text;
         [SerializeField] TextMeshProUGUI _item2Text;
-        [SerializeField] TextMeshProUGUI _item3Text;
 
         int _selectedIndex;
         TextMeshProUGUI[] _itemTexts;
-
-        const int kSoundCheckIndex = 2;
-        const string kSoundCheckSceneName = "SoundCheckScene";
 
         private void Awake()
         {
@@ -48,7 +44,7 @@ namespace SGGames.Game.Develop
         async void Run()
         {
             // Updateで選択状態を切り替えやすいよう、表示対象を配列としてまとめる.
-            _itemTexts = new[] { _item1Text, _item2Text, _item3Text };
+            _itemTexts = new[] { _item1Text, _item2Text };
             RefreshSelection();
             await UniTask.CompletedTask;
 
@@ -68,20 +64,13 @@ namespace SGGames.Game.Develop
             PlayerInputManager.UIActions inputUI = inputManager.UIAction;
             if (inputUI.AxisUp)
             {
-                _selectedIndex = _selectedIndex == 0 ? _itemTexts.Length - 1 : _selectedIndex - 1;
+                _selectedIndex = _selectedIndex == 0 ? 1 : 0;
                 RefreshSelection();
             }
             else if (inputUI.AxisDown)
             {
-                _selectedIndex = _selectedIndex == _itemTexts.Length - 1 ? 0 : _selectedIndex + 1;
+                _selectedIndex = _selectedIndex == 0 ? 1 : 0;
                 RefreshSelection();
-            }
-            else if (inputUI.Decide || (inputManager.IsInputBlocked == false && UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.enterKey.wasPressedThisFrame))
-            {
-                if (_selectedIndex == kSoundCheckIndex && ISceneTransitionManager.Instance != null)
-                {
-                    ISceneTransitionManager.Instance.RequestSceneChange(kSoundCheckSceneName).Forget();
-                }
             }
         }
 
