@@ -58,9 +58,9 @@ namespace SGSys
                 {
                     mOsVersion = buildClass.GetStatic<string>("RELEASE");
                     mApiLevel = buildClass.GetStatic<int>("SDK_INT");
-                    #if SGSYS_DEBUG
+#if GAME_DEBUG
                     DebugLog.Info("PlatformAndroid OS Version=["+mOsVersion+"] API Level=["+mApiLevel+"]" );
-                    #endif
+#endif
                 }
             }
             if ( null != mActivity )
@@ -94,7 +94,7 @@ namespace SGSys
         {
             return mSignature;
         }
-#if SGSYS_DEBUG
+#if GAME_DEBUG
         public override void Debug_SetSignature2(string sig2)
         {
             mSignature2 = sig2;
@@ -136,9 +136,9 @@ namespace SGSys
         {
             if ( null == mActivity )
             {
-#if SGSYS_DEBUG
+#if GAME_DEBUG
                 DebugLog.Error("PlatformAndroid ShowAlertDialog : mActivity == null");
-#endif //SGSYS_DEBUG
+#endif //GAME_DEBUG
                 return;
             }
             mActivity.Call("runOnUiThread", new AndroidJavaRunnable( ()=> {
@@ -161,14 +161,14 @@ namespace SGSys
         {
             if ( null == mActivity )
             {
-#if SGSYS_DEBUG
+#if GAME_DEBUG
                 DebugLog.Error("PlatformAndroid ShowIndicator : mActivity == null");
 #endif
                 return;
             }
             if ( null == mIndicator )
             {
-#if SGSYS_DEBUG
+#if GAME_DEBUG
                 DebugLog.Error("PlatformAndroid ShowIndicator : mIndicator == null");
 #endif
                 return;
@@ -182,14 +182,14 @@ namespace SGSys
         {
             if ( null == mActivity )
             {
-#if SGSYS_DEBUG
+#if GAME_DEBUG
                 DebugLog.Error("PlatformAndroid HideIndicator : mActivity == null");
 #endif
                 return;
             }
             if ( null == mIndicator )
             {
-#if SGSYS_DEBUG
+#if GAME_DEBUG
                 DebugLog.Error("PlatformAndroid HideIndicator : mIndicator == null");
 #endif
                 return;
@@ -279,19 +279,8 @@ namespace SGSys
         }
 #endif    
 
-
-
-
-
-
-
-
-
-
-
-        
-        
-        private void GetLocale( out string lang, out string country ) {
+        private void GetLocale( out string lang, out string country )
+        {
             if ( null != mActivity ) {
                 string locale = mActivity.CallStatic<string>("GetLocale");
                 string[] splits = locale.Split('_');
@@ -305,7 +294,8 @@ namespace SGSys
         }
 
 
-        public override void EnableLog(bool enabled) {
+        public override void EnableLog(bool enabled)
+        {
 #if PLATFORM_TEST_MODE
 #else
             mActivity.CallStatic("EnableLog", enabled);
@@ -313,7 +303,8 @@ namespace SGSys
         }
 
 
-        private string GetPrefDir() {
+        private string GetPrefDir()
+        {
             if ( null == mActivity ) {
                 return null;
             }
@@ -322,29 +313,32 @@ namespace SGSys
             return path + "/.xeen/" + this.prefRoot;
         }
 
-        private string GetPrefPath( string key ) {
+        private string GetPrefPath( string key )
+        {
             string path = GetPrefDir();
-            if ( null == path ) {
+            if ( null == path )
+            {
                 return null;
             }
             path += "/" +key.GetHashCode().ToString();
             return path;
         }
 
-        public override void InitializePreference(string root) {
+        public override void InitializePreference(string root)
+        {
             this.prefRoot = root.GetHashCode().ToString();
         }
 
-        public override string LoadPreference(string key) {
-
+        public override string LoadPreference(string key)
+        {
             string path = GetPrefPath(key);
             if ( null == path ) {
-#if XESYS_DEBUG
+#if GAME_DEBUG
                 DebugLog.Warning("PlatformAndroid.LoadPreference : null");
 #endif
                 return null;
             }
-#if XESYS_DEBUG
+#if GAME_DEBUG
             DebugLog.Info("PlatformAndroid.LoadPreference : " + path );
 #endif
 
@@ -362,56 +356,62 @@ namespace SGSys
             }
             string text = sr.ReadToEnd();
             sr.Close();
-#if XESYS_DEBUG
+#if GAME_DEBUG
             DebugLog.Info("PlatformAndroid.LoadPreference : key="+key+" value="+text);
 #endif
             return text;
         }
 
-
-        public override void SavePreference(string key, string value) {
+        public override void SavePreference(string key, string value)
+        {
             string path = GetPrefPath( key );
-            if ( null == path ) {
-#if XESYS_DEBUG
+            if ( null == path )
+            {
+#if GAME_DEBUG
                 DebugLog.Warning("PlatformAndroid.SavePreference : path is null");
 #endif
                 return;
             }
-#if XESYS_DEBUG
+#if GAME_DEBUG
             DebugLog.Info("PlatformAndroid.SavePreference : " + path );
 #endif
 
             string pathDir = System.IO.Path.GetDirectoryName( path );
-            if ( !System.IO.Directory.Exists( pathDir ) ) {
-#if XESYS_DEBUG
+            if ( !System.IO.Directory.Exists( pathDir ) )
+            {
+#if GAME_DEBUG
                 DebugLog.Info("PlatformAndroid.SavePreference : CreateDirectory="+pathDir );
 #endif
                 System.IO.Directory.CreateDirectory( pathDir );
             }
 
             System.IO.StreamWriter sw = new System.IO.StreamWriter( path, false );
-            if ( null == sw ) {
+            if ( null == sw )
+            {
                 return;
             }
             sw.Write( value );
             sw.Close();
 
-#if XESYS_DEBUG
+#if GAME_DEBUG
             DebugLog.Info("PlatformAndroid.SavePreference : key="+key+" value="+value);
 #endif
         }
 
-        public override void DeletePreference(string key) {
+        public override void DeletePreference(string key)
+        {
             string path = GetPrefPath( key );
             System.IO.File.Delete(path);
-#if XESYS_DEBUG
+#if GAME_DEBUG
             DebugLog.Info("PlatformAndroid.DeletePreference : key="+key );
 #endif
         }
 
-        public override bool HasPreference(string key) {
+        public override bool HasPreference(string key)
+        {
             string path = GetPrefPath( key );
-            if ( System.IO.File.Exists( path ) ) {
+            if ( System.IO.File.Exists( path ) )
+            {
                 return true;
             }
             return false;
@@ -423,7 +423,8 @@ namespace SGSys
         /// <param name="subject"></param>
         /// <param name="title"></param>
         /// <param name="body"></param>
-        public override void ShareMessage(string subject, string title, string body) {
+        public override void ShareMessage(string subject, string title, string body)
+        {
             var intentClass = new AndroidJavaClass("android.content.Intent");
             var intentObject = new AndroidJavaObject("android.content.Intent");
             // intentのアクション設定
@@ -444,7 +445,8 @@ namespace SGSys
         /// システムのクリップボードへテキストをコピー
         /// </summary>
         /// <param name="text"></param>
-        public override void SetClipboardText(string text) {
+        public override void SetClipboardText(string text)
+        {
             // アクティビティを取得
             var jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             var jo = jc.GetStatic<AndroidJavaObject>("currentActivity");
@@ -459,14 +461,17 @@ namespace SGSys
 
 
 
-        public override string TestString() {
-            if ( null == mActivity ) {
+        public override string TestString()
+        {
+            if ( null == mActivity )
+            {
                 return "";
             }
             return mActivity.Call<string>("TestString");
         }
 
-        public override void WebViewRemoveAllCookie() {
+        public override void WebViewRemoveAllCookie()
+        {
             var cookieManager = new AndroidJavaClass("android.webkit.CookieManager").CallStatic<AndroidJavaObject>("getInstance");
 //			cookieManager.Call("setAcceptCookie", new object[] { true });
             cookieManager.Call("removeAllCookie");
@@ -476,7 +481,8 @@ namespace SGSys
         /// ストレージの空き容量を計算する
         /// </summary>
         /// <returns></returns>
-        public override long CalcStorageAvailableSize () {
+        public override long CalcStorageAvailableSize ()
+        {
             var statFs = new AndroidJavaObject("android.os.StatFs", Application.temporaryCachePath );
             var availableBlocks = statFs.Call<long>("getAvailableBlocksLong");
             var blockSize = statFs.Call<long>("getBlockSizeLong");
@@ -484,7 +490,7 @@ namespace SGSys
             return freeBytes;
         }
     }
-} //namespace XeLib
+} //namespace SGLib
 
 
 #endif //UNITY_ANDROID
