@@ -61,7 +61,7 @@ namespace SGGames.Game.Sys
     //==========================================================================
     public sealed class PersistentSceneLifetimeScope : LifetimeScope
     {
-//==========================================================================
+        //==========================================================================
 #if GAME_DEBUG && !IS_PRODUCT
          // PersistentSceneが起動時に生成するDebugSystemManager Prefab.
          // デバッグ機能管理は開発中全シーン共通で必要になるため、PersistentSceneで常駐させる.
@@ -69,7 +69,7 @@ namespace SGGames.Game.Sys
          [SerializeField] GameObject _debugSystemManagerPrefab;
          GameObject _debugSystemManagerInstance;
 #endif
-//==========================================================================
+        //==========================================================================
 
         // PersistentSceneが起動時に生成するMainCamera Prefab.
         // SerializeFieldで参照を持つことで、必須システムをビルドに含める.
@@ -100,6 +100,15 @@ namespace SGGames.Game.Sys
         [Header("シーン推移管理システム")]
         [SerializeField] GameObject _sceneTransitionManagerPrefab;
         GameObject _sceneTransitionManagerInstance;
+        //==========================================================================
+
+        // PersistentSceneが起動時に生成するGameManager Prefab.
+        // アプリ固有の機能やシステムは全てこれが管理。全シーン共通で必要になるため、PersistentSceneで常駐させる.
+        [Header("アプリ固有機能管理システム")]
+        [SerializeField] GameObject _gameManagerPrefab;
+        GameObject _gameManagerInstance;
+
+        //==========================================================================
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -117,7 +126,9 @@ namespace SGGames.Game.Sys
             InitializeSoundManager();
             InitializeWindowManager();
             InitializeSceneTransitionManager();
-          
+
+            InitializeGameManager();
+
             // 非製品版はデバッグシーン、製品版はタイトルシーンへ遷移する.
             string              _nextSceneName  = "";
 #if !IS_PRODUCT
@@ -243,6 +254,28 @@ namespace SGGames.Game.Sys
             }
 
             _sceneTransitionManagerInstance = Instantiate(_sceneTransitionManagerPrefab, transform);
+        }
+
+        void InitializeGameManager()
+        {
+            // GameManagerも他Managerと同様、既存登録があれば重複生成しない.
+            if (_gameManagerInstance != null)
+            {
+                return;
+            }
+
+            if (IGameManager.Instance != null)
+            {
+                return;
+            }
+
+            if (_gameManagerPrefab == null)
+            {
+                DebugLog.Error( SystemConst.DebugGroup.Game, "GameManager : PrefabがPersistentSceneLifetimeScopeに設定されていません。");
+                return;
+            }
+
+            _gameManagerInstance = Instantiate(_gameManagerPrefab, transform);
         }
 
 #if GAME_DEBUG && !IS_PRODUCT

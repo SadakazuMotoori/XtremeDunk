@@ -131,6 +131,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PersistentSceneLifetimeScope
       objectReference: {fileID: 0}
+    - target: {fileID: 3676442989160439881, guid: 0eb36b955f1998047adfd0e28711642c, type: 3}
+      propertyPath: _gameManagerPrefab
+      value: 
+      objectReference: {fileID: 5749072291482108653, guid: 95a000ec90ee63647bf454315c01f804, type: 3}
     - target: {fileID: 6592859202638186908, guid: 0eb36b955f1998047adfd0e28711642c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

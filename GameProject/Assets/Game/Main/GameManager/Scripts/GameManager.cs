@@ -25,6 +25,12 @@ namespace SGGames.Game
             ServiceLocator<IGameManager>.Register(this);
 
             Screen.orientation = ScreenOrientation.LandscapeLeft;
+
+            // システム系初期化
+            SGSys.Platform.Create();
+
+            // ゲーム系初期化
+            SGGames.Game.GameSettings.Create();
 /*
             SGSys.SystemManager.Create();
             SGSys.Gfx.MaterialManager.Create();
