@@ -155,7 +155,8 @@ namespace SGSys
 		public override bool HasPreference(string key)
 		{
 			string path = GetPreferencePath( key );
-			if ( System.IO.File.Exists( path ) ) {
+			if ( System.IO.File.Exists( path ) )
+			{
 				return true;
 			}
 			return false;

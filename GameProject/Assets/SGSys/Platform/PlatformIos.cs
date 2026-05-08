@@ -15,31 +15,36 @@ using UnityEngine;
 using System.Runtime.InteropServices;
 
 
-namespace SGSys {
+namespace SGSys
+{
     public class PlatformIos : PlatformImpl
     {
-        [DllImport ("__Internal")]	private static extern void XeSysUtility_Initialize();
-        [DllImport ("__Internal")]	private static extern void XeSysUtility_ShowAlertDialog( string title, string body, string ok );
-        [DllImport ("__Internal")]	private static extern void XeSysUtility_ShowIndicator();
-        [DllImport ("__Internal")]	private static extern void XeSysUtility_HideIndicator();
-        [DllImport ("__Internal")]	private static extern float XeSysUtility_EnableBatteryMonitoring( bool enabled );
-        [DllImport ("__Internal")]	private static extern float XeSysUtility_GetBatteryLevel();
-        [DllImport ("__Internal")]	private static extern int XeSysUtility_GetBatteryStatus();
-        [DllImport ("__Internal")]	private static extern void XeSysUtility_ShareMessage( string subject, string title, string body );
-        [DllImport ("__Internal")]	private static extern void XeSysUtility_SetClipboardText( string text );
-        [DllImport ("__Internal")]	private static extern void XeSysUtility_WebViewRemoveAllCookie();
-        [DllImport ("__Internal")]  private static extern long XeSysUtility_CalcStorageAvailableSize();
+        [DllImport ("__Internal")]	private static extern void SGSysUtility_Initialize();
+        [DllImport ("__Internal")]	private static extern void SGSysUtility_ShowAlertDialog( string title, string body, string ok );
+        [DllImport ("__Internal")]	private static extern void SGSysUtility_ShowIndicator();
+        [DllImport ("__Internal")]	private static extern void SGSysUtility_HideIndicator();
+        [DllImport ("__Internal")]	private static extern float SGSysUtility_EnableBatteryMonitoring( bool enabled );
+        [DllImport ("__Internal")]	private static extern float SGSysUtility_GetBatteryLevel();
+        [DllImport ("__Internal")]	private static extern int SGSysUtility_GetBatteryStatus();
+        [DllImport ("__Internal")]	private static extern void SGSysUtility_ShareMessage( string subject, string title, string body );
+        [DllImport ("__Internal")]	private static extern void SGSysUtility_SetClipboardText( string text );
+        [DllImport ("__Internal")]	private static extern void SGSysUtility_WebViewRemoveAllCookie();
+        [DllImport ("__Internal")]  private static extern long SGSysUtility_CalcStorageAvailableSize();
 
         public PlatformIos() : base("ios")
         {
         }
         
-        public override void	Initialize()
+        public override void Initialize()
         {
-            XeSysUtility_Initialize();
+            SGSysUtility_Initialize();
 
             GameObject obj = new GameObject("PlatformIos");
-            SystemManager.Instance.AddToSystemGroup( obj );
+            GameObject systemRoot = GameObject.Find("PersistentSceneLifetimeScope");
+            if (systemRoot != null)
+            {
+                obj.transform.SetParent(systemRoot.transform);
+            }
         }
     
         public override string	GetOsVersion()
@@ -58,20 +63,18 @@ namespace SGSys {
 
         public override void	ShowAlertDialog( string title, string body, string ok )
         {
-            XeSysUtility_ShowAlertDialog( title, body, ok );
+            SGSysUtility_ShowAlertDialog( title, body, ok );
         }
 
         public override void ShowIndicator()
         {
-            XeSysUtility_ShowIndicator();
+            SGSysUtility_ShowIndicator();
         }
         
         public override void HideIndicator()
         {
-            XeSysUtility_HideIndicator();
+            SGSysUtility_HideIndicator();
         }
-
-
 
         public override void EnableLog(bool enabled)
         {
@@ -103,18 +106,18 @@ namespace SGSys {
 
         public override void EnableBatteryMonitoring(bool enabled)
         {
-            XeSysUtility_EnableBatteryMonitoring( enabled );
+            SGSysUtility_EnableBatteryMonitoring( enabled );
         }
 
 #if false   //UnityEngine.SystemInfo.batteryLevelが正しく無い時はこちらを利用する
         public override float GetBatteryLevel() {
-            return XeSysUtility_GetBatteryLevel();
+            return SGSysUtility_GetBatteryLevel();
         }
 #endif
 
 #if false   //UnityEngine.SystemInfo.batteryStatusが正しく無い時はこちらを利用する
         public override BatteryStatus GetBatteryStatus() {
-            return (BatteryStatus)XeSysUtility_GetBatteryStatus();
+            return (BatteryStatus)SGSysUtility_GetBatteryStatus();
         }
 #endif
 
@@ -126,7 +129,7 @@ namespace SGSys {
         /// <param name="body"></param>
         public override void ShareMessage(string subject, string title, string body)
         {
-            XeSysUtility_ShareMessage(subject, title, body);
+            SGSysUtility_ShareMessage(subject, title, body);
         }
 
         /// <summary>
@@ -135,13 +138,13 @@ namespace SGSys {
         /// <param name="text"></param>
         public override void SetClipboardText(string text)
         {
-            XeSysUtility_SetClipboardText(text);
+            SGSysUtility_SetClipboardText(text);
         }
 
 
         public override void WebViewRemoveAllCookie()
         {
-            XeSysUtility_WebViewRemoveAllCookie();
+            SGSysUtility_WebViewRemoveAllCookie();
         }
 
         /// <summary>
@@ -150,7 +153,7 @@ namespace SGSys {
         /// <returns></returns>
         public override long CalcStorageAvailableSize ()
         {
-            return XeSysUtility_CalcStorageAvailableSize();
+            return SGSysUtility_CalcStorageAvailableSize();
         }
     }
 

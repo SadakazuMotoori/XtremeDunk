@@ -31,8 +31,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
-#pragma warning disable 162
-
 sealed public class IOSKeyChain
 {
 #if UNITY_IOS && !UNITY_EDITOR

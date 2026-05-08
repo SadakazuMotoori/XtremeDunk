@@ -34,7 +34,8 @@ namespace SGSys
 #if GAME_DEBUG
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            for ( int i=0; i<count; ++i ) {
+            for ( int i=0; i<count; ++i )
+            {
                 action(i);
             }
             sw.Stop();
